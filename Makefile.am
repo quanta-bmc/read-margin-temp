@@ -7,13 +7,13 @@ AM_CXXFLAGS = $(CODE_COVERAGE_CXXFLAGS)
 bin_PROGRAMS = read-margin-temp
 
 read-margin-temp_SOURCES = main.cpp
-read-margin-temp_LDADD = \
-	libread-margin-temp.la
+#read-margin-temp_LDADD = \
+#	libread-margin-temp.la
 
-noinst_LTLIBRARIES = libread-margin-temp.la
-libread-margin-temp_la_LDFLAGS = -static
+#noinst_LTLIBRARIES = libread-margin-temp.la
+#libread-margin-temp_la_LDFLAGS = -static
 
-libread-margin-temp_la_SOURCES = \
-    json/buildjson.cpp \
-    sensor/sensor.cpp \
-    util/util.cpp
+#libread-margin-temp_la_SOURCES = \
+#    json/buildjson.cpp \
+#    sensor/sensor.cpp \
+#    util/util.cpp
