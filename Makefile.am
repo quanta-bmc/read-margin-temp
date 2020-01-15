@@ -1,3 +1,4 @@
+AM_DEFAULT_SOURCE_EXT = .cpp
 ACLOCAL_AMFLAGS = -I m4
 
 # Ignore system headers
@@ -34,7 +35,6 @@ else
 @CODE_COVERAGE_RULES@
 endif
 
-AM_DEFAULT_SOURCE_EXT = .cpp
 AM_CPPFLAGS = $(CODE_COVERAGE_CPPFLAGS)
 AM_CFLAGS = $(CODE_COVERAGE_CFLAGS)
 AM_CXXFLAGS = $(CODE_COVERAGE_CXXFLAGS)
@@ -45,18 +45,18 @@ read_margin_temp_SOURCES = main.cpp
 read_margin_temp_CXXFLAGS = \
 	$(CODE_COVERAGE_CXXFLAGS)
 read_margin_temp_LDADD = \
-	libReadMarginTemp.la
+	libread_margin_temp.la
 
-noinst_LTLIBRARIES = libReadMarginTemp.la
-libReadMarginTemp_la_LDFLAGS = -static
-libReadMarginTemp_la_LIBADD = \
+noinst_LTLIBRARIES = libread_margin_temp.la
+libread_margin_temp_la_LDFLAGS = -static
+libread_margin_temp_la_LIBADD = \
 	-lstdc++fs \
     $(CODE_COVERAGE_LIBS)
 
-libReadMarginTemp_la_CXXFLAGS = \
+libread_margin_temp_la_CXXFLAGS = \
 	$(CODE_COVERAGE_CXXFLAGS)
 
-libReadMarginTemp_la_SOURCES = \
+libread_margin_temp_la_SOURCES = \
     json/buildjson.cpp \
     sensor/sensor.cpp \
     util/util.cpp
