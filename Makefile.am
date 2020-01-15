@@ -1,5 +1,4 @@
 AM_DEFAULT_SOURCE_EXT = .cpp
-ACLOCAL_AMFLAGS = -I m4
 
 # Ignore system headers
 CODE_COVERAGE_IGNORE_PATTERN = '/include/*' '/usr/include/*' '$(includedir)/*'
@@ -57,7 +56,7 @@ libread_margin_temp_la_LIBADD = \
     $(CODE_COVERAGE_LIBS)
 
 libread_margin_temp_la_CXXFLAGS = \
-$(SDBUSPLUS_CFLAGS) \
+    $(SDBUSPLUS_CFLAGS) \
 	$(PHOSPHOR_DBUS_INTERFACES_CFLAGS) \
 	$(PHOSPHOR_LOGGING_CFLAGS) \
 	$(CODE_COVERAGE_CXXFLAGS)
