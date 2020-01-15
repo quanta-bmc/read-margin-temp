@@ -1,6 +1,6 @@
 # Initialization
 AC_PREREQ([2.69])
-AC_INIT([swampd], [0.1], [https://github.com/openbmc/phosphor-pid-control/issues])
+AC_INIT([read-margin-temp], [0.1], [https://github.com/openbmc/phosphor-pid-control/issues])
 AC_LANG([C++])
 AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE([subdir-objects -Wall -Wno-portability -Werror foreign dist-xz])
@@ -50,28 +50,6 @@ AC_CHECK_HEADER(
     [],
     [AC_MSG_ERROR([Could not find nlohmann/json.hpp])]
 )
-# We need the header only CLI library
-AC_CHECK_HEADERS(
-    [CLI/CLI.hpp],
-    [],
-    [AC_MSG_ERROR([Could not find CLI11 CLI/CLI.hpp])]
-)
-
-# check for boost headers
-AC_CHECK_HEADER(
-    boost/asio/io_context.hpp,
-    [],
-    [AC_MSG_ERROR([Could not find boost/asio/io_context.hpp])]
-)
-AC_CHECK_HEADER(
-    boost/asio/steady_timer.hpp,
-    [],
-    [AC_MSG_ERROR([Could not find boost/asio/steady_timer.hpp])]
-)
-AX_APPEND_COMPILE_FLAGS(["-DBOOST_ASIO_DISABLE_THREADS"], [CPPFLAGS])
-AX_APPEND_COMPILE_FLAGS(["-DBOOST_ERROR_CODE_HEADER_ONLY"], [CPPFLAGS])
-AX_APPEND_COMPILE_FLAGS(["-DBOOST_SYSTEM_NO_DEPRECATED"], [CPPFLAGS])
-AX_APPEND_COMPILE_FLAGS(["-DBOOST_ASIO_NO_DEPRECATED"], [CPPFLAGS])
 
 # Checks for library functions.
 LT_INIT # Required for systemd linking
