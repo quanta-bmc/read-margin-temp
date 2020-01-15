@@ -6,17 +6,18 @@ read_margin_temp_SOURCES = main.cpp
 read_margin_temp_LDFLAGS = -lstdc++fs
 
 read_margin_temp_LDADD = \
-	libread_margin_temp.la
+	libReadMarginTemp.la
 
-noinst_LTLIBRARIES = libread_margin_temp.la
-libread_margin_temp_la_LDFLAGS = -static
-libread_margin_temp_la_LIBADD = \
+noinst_LTLIBRARIES = libReadMarginTemp.la
+libReadMarginTemp_la_LDFLAGS = -static
+libReadMarginTemp_la_LIBADD = \
 	-lstdc++fs \
+    $(CODE_COVERAGE_LIBS)
 
-libread_margin_temp_la_CXXFLAGS = \
-	-flto
+libReadMarginTemp_la_CXXFLAGS = \
+	$(CODE_COVERAGE_CXXFLAGS)
 
-libread_margin_temp_la_SOURCES = \
+libReadMarginTemp_la_SOURCES = \
     json/buildjson.cpp \
     sensor/sensor.cpp \
     util/util.cpp \
