@@ -12,8 +12,6 @@
 #include "sensor/sensor.hpp"
 #include "util/util.hpp"
 
-using json = nlohmann::json;
-
 #define FAN_TABLE_SKU1_FILE "/usr/share/swampd/config-sku1.json"
 #define FAN_TABLE_SKU2_FILE "/usr/share/swampd/config-sku2.json"
 #define FAN_TABLE_SKU3_FILE "/usr/share/swampd/config-sku3.json"

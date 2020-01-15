@@ -1,3 +1,5 @@
+#pragma once
+
 #include <string>
 
 #define FAN_PATH "/sys/devices/platform/ahb/ahb:apb/f0083000.i2c/i2c-3/3-0075"
