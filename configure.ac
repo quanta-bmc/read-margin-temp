@@ -18,6 +18,13 @@ AX_APPEND_COMPILE_FLAGS([-Wall -Wno-unused-variable], [CXXFLAGS])
 
 LT_INIT # Required for systemd linking
 
+# Checks for libraries.
+AC_CHECK_HEADER(
+    nlohmann/json.hpp,
+    [],
+    [AC_MSG_ERROR([Could not find nlohmann/json.hpp])]
+)
+
 # Create configured output
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
