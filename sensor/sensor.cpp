@@ -64,7 +64,7 @@ std::string getTempI2coolPath(int num)
     std::string tempI2coolPath = I2COOL_PATH;
     std::string cmd = "";
     std::string channel = "";
-    DIR *dir;
+    // DIR *dir;
 
     if (num == 0)
     {
@@ -83,7 +83,7 @@ std::string getTempI2coolPath(int num)
         channel = "/channel-6";
     }
 
-    dir = opendir(tempI2coolPath.c_str());
+    // dir = opendir(tempI2coolPath.c_str());
 
     // cmd = "ls -la ";
     // cmd += I2COOL_PATH;

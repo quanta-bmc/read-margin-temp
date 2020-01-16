@@ -8,6 +8,7 @@
 
 #include <nlohmann/json.hpp>
 
+#include "conf.hpp"
 #include "json/buildjson.hpp"
 #include "sensor/sensor.hpp"
 #include "util/util.hpp"
@@ -28,7 +29,7 @@ conf::skuConfig skuConfig;
 void run()
 {
     /** determine sku **/
-    int skuNum = getSkuNum();
+    // int skuNum = getSkuNum();
 
     try
     {

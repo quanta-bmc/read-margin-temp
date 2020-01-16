@@ -1,6 +1,8 @@
 #include <fstream>
+#include <iostream>
 #include <string>
 #include <vector>
+
 #include <nlohmann/json.hpp>
 
 #include "conf.hpp"
@@ -26,7 +28,7 @@ void from_json(
 }
 }
 
-std::map<std::string, struct nlohmann::conf::sensorConfig>
+std::map<std::string, struct conf::sensorConfig>
     getSensorInfo(const nlohmann::json& data)
 {
     std::map<std::string, struct conf::sensorConfig> config;
@@ -45,20 +47,19 @@ std::map<std::string, struct nlohmann::conf::sensorConfig>
 
 conf::skuConfig getSkuInfo(const nlohmann::json& data)
 {
+    conf::skuConfig skuConfig;
     auto skus = data["skus"];
     for (const auto& sku : skus)
     {
-        conf::skuConfig skuConfig;
-        int num = sku["num"];
+        // int num = sku["num"];
         auto zones = sku["zones"];
 
         for (const auto& zone : zones)
         {
             auto id = zone["id"];
             auto components = zone.get<std::vector<std::string>>();
+            skuConfig[id] = components;
         }
-
-        skuConfig[id] = components;
     }
 
     return skuConfig;
@@ -66,38 +67,38 @@ conf::skuConfig getSkuInfo(const nlohmann::json& data)
 
 void validateJson(const nlohmann::json& data)
 {
-    if (data.count("sensors") != 1)
-    {
-        throw ConfigurationException(
-            "KeyError: 'sensors' not found (or found repeatedly)");
-    }
+    // if (data.count("sensors") != 1)
+    // {
+    //     throw ConfigurationException(
+    //         "KeyError: 'sensors' not found (or found repeatedly)");
+    // }
 
-    if (data["sensors"].size() == 0)
-    {
-        throw ConfigurationException(
-            "Invalid Configuration: At least one sensor required");
-    }
+    // if (data["sensors"].size() == 0)
+    // {
+    //     throw ConfigurationException(
+    //         "Invalid Configuration: At least one sensor required");
+    // }
 
-    if (data.count("skus") != 1)
-    {
-        throw ConfigurationException(
-            "KeyError: 'skus' not found (or found repeatedly)");
-    }
+    // if (data.count("skus") != 1)
+    // {
+    //     throw ConfigurationException(
+    //         "KeyError: 'skus' not found (or found repeatedly)");
+    // }
 
-    for (const auto& sku : data["skus"])
-    {
-        if (sku.count("zones") != 1)
-        {
-            throw ConfigurationException(
-                "KeyError: should only have one 'zones' key per sku.");
-        }
+    // for (const auto& sku : data["skus"])
+    // {
+    //     if (sku.count("zones") != 1)
+    //     {
+    //         throw ConfigurationException(
+    //             "KeyError: should only have one 'zones' key per sku.");
+    //     }
 
-        if (sku["zones"].size() == 0)
-        {
-            throw ConfigurationException(
-                "Invalid Configuration: must be at least one zones per sku.");
-        }
-    }
+    //     if (sku["zones"].size() == 0)
+    //     {
+    //         throw ConfigurationException(
+    //             "Invalid Configuration: must be at least one zones per sku.");
+    //     }
+    // }
 }
 
 nlohmann::json parseValidateJson(const std::string& path)
@@ -105,13 +106,13 @@ nlohmann::json parseValidateJson(const std::string& path)
     std::ifstream jsonFile(path);
     if (!jsonFile.is_open())
     {
-        throw ConfigurationException("Unable to open json file");
+        std::cerr << "Unable to open json file" << std::endl;
     }
 
     auto data = nlohmann::json::parse(jsonFile, nullptr, false);
     if (data.is_discarded())
     {
-        throw ConfigurationException("Invalid json - parse failed");
+        std::cerr << "Invalid json - parse failed" << std::endl;
     }
 
     /* Check the data. */

@@ -4,10 +4,10 @@
 #include <string>
 #include <map>
 
-std::map<std::string, struct nlohmann::conf::sensorConfig>
+std::map<std::string, struct conf::sensorConfig>
     getSensorInfo(const nlohmann::json& data);
 
-conf::skuConfig getSkuInfo(const json& data);
+conf::skuConfig getSkuInfo(const nlohmann::json& data);
 
 /**
  * Given json data, validate the minimum.
