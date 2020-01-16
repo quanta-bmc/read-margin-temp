@@ -1,5 +1,10 @@
 #pragma once
 
+#include <map>
+#include <vector>
+
+#include "conf.hpp"
+
 #define NUMBER_OF_SENSOR 4
 #define TEMP_CPU_0_SPEC 0
 #define TEMP_CPU_1_SPEC 0
@@ -28,4 +33,6 @@ constexpr auto dbusSetPropertyCommand =
 
 int getSkuNum();
 
-void updateMarginTempLoop();
+void updateMarginTempLoop(
+    std::map<int, std::vector<std::string>> skuConfig,
+    std::map<std::string, struct conf::sensorConfig> sensorConfig);

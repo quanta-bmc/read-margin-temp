@@ -47,22 +47,25 @@ std::map<std::string, struct conf::sensorConfig>
 
 conf::skuConfig getSkuInfo(const nlohmann::json& data)
 {
-    conf::skuConfig skuConfig;
+    conf::skuConfig skusConfig;
     auto skus = data["skus"];
+
     for (const auto& sku : skus)
     {
-        // int num = sku["num"];
+        std::map<int, std::vector<std::string>> skuZonesInfo;
+        auto num = sku["num"];
         auto zones = sku["zones"];
 
         for (const auto& zone : zones)
         {
             auto id = zone["id"];
             auto components = zone.get<std::vector<std::string>>();
-            skuConfig[id] = components;
+            skuZonesInfo[id] = components;
         }
+        skusConfig[num] = skuZonesInfo;
     }
 
-    return skuConfig;
+    return skusConfig;
 }
 
 void validateJson(const nlohmann::json& data)

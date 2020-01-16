@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include <map>
 
 namespace conf
 {
@@ -16,5 +17,5 @@ struct sensorConfig
     int spec;
 };
 
-using skuConfig = std::map<int, std::vector<std::string>>;
+using skuConfig = std::map<int, std::map<int, std::vector<std::string>>>;
 } // namespace conf

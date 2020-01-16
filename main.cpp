@@ -23,19 +23,19 @@
 constexpr auto marginConfigPath = 
     "/usr/share/read-margin-temp/config-margin.json";
 
-std::map<std::string, struct conf::sensorConfig> sensorConfig = {};
-conf::skuConfig skuConfig;
+std::map<std::string, struct conf::sensorConfig> sensorConfig;
+conf::skuConfig skusConfig;
 
 void run()
 {
-    /** determine sku **/
-    // int skuNum = getSkuNum();
+    std::map<int, std::vector<std::string>> skuConfig;
+    int skuNum;
 
     try
     {
         auto jsonData = parseValidateJson(marginConfigPath);
         sensorConfig = getSensorInfo(jsonData);
-        skuConfig = getSkuInfo(jsonData);
+        skusConfig = getSkuInfo(jsonData);
     }
     catch (const std::exception& e)
     {
@@ -43,21 +43,12 @@ void run()
         exit(EXIT_FAILURE);
     }
 
-    // mgmr = buildSensors(sensorConfig, passiveBus, hostBus);
-    // zones = buildZones(zoneConfig, zoneDetailsConfig, mgmr, modeControlBus);
+    /** determine sku **/
+    skuNum = getSkuNum();
+    skuConfig = skusConfig[skuNum];
 
-    // if (0 == zones.size())
-    // {
-    //     std::cerr << "No zones defined, exiting.\n";
-    //     std::exit(EXIT_FAILURE);
-    // }
-
-    // for (const auto& i : zones)
-    // {
-    //     auto& timer = timers.emplace_back(io);
-    //     std::cerr << "pushing zone " << i.first << "\n";
-    //     pidControlLoop(i.second.get(), timer);
-    // }
+    /** start update loop **/
+    updateMarginTempLoop(skuConfig, sensorConfig);
 }
 
 int main(int argc, char* argv[])

@@ -2,7 +2,10 @@
 #include <string>
 #include <chrono>
 #include <thread>
+#include <map>
+#include <vector>
 
+#include "conf.hpp"
 #include "util/util.hpp"
 #include "sensor/sensor.hpp"
 
@@ -60,43 +63,53 @@ int getSkuNum()
     return skuNum;
 }
 
-void updateMarginTempLoop()
+void updateMarginTempLoop(
+    std::map<int, std::vector<std::string>> skuConfig,
+    std::map<std::string, struct conf::sensorConfig> sensorConfig)
 {
-        /*** update fleeting0 temp ***/
     std::fstream sensorTempFile;
     std::string tmp;
-    int sensorRealTemp = 0;
-    int sensorSpecTemp = 0;
-    int sensorMarginTemp = 0;
-    int marginTemp = -1;
-    std::pair<std::string, int> sensorList[NUMBER_OF_SENSOR];
+    int numOfZones = skuConfig.size();
+    int sensorRealTemp;
+    int sensorSpecTemp;
+    int sensorMarginTemp;
+    int marginTemp;
+    std::map<std::string, struct conf::sensorConfig> sensorList[numOfZones];
 
-    sensorList[0] = std::make_pair(getTempI2coolPath(0), TEMP_I2COOL_0_SPEC);
-    sensorList[1] = std::make_pair(getTempI2coolPath(1), TEMP_I2COOL_1_SPEC);
-    sensorList[2] = std::make_pair(getTempI2coolPath(2), TEMP_I2COOL_2_SPEC);
-    sensorList[3] = std::make_pair(getTempI2coolPath(3), TEMP_I2COOL_3_SPEC);
+    for (int i = 0; i < numOfZones; i++)
+    {
+        for (auto t = skuConfig[i].begin(); t != skuConfig[i].end(); t++)
+        {
+            sensorList[i][*t] = sensorConfig[*t];
+        }
+    }
 
     while (true)
     {
-        for (int i = 0; i < NUMBER_OF_SENSOR; i++)
+        for (int i = 0; i < numOfZones; i++)
         {
-            sensorTempFile.open(sensorList[i].first, std::ios::in);
-            sensorSpecTemp = sensorList[i].second;
-            if (sensorTempFile)
+            marginTemp = -1;
+            for (auto t = sensorList[i].begin(); t != sensorList[i].end(); t++)
             {
-                sensorTempFile >> sensorRealTemp;
-            }
-            sensorTempFile.close();
-            sensorMarginTemp = (sensorSpecTemp - sensorRealTemp) / 1000;
+                sensorRealTemp = 0;
+                sensorSpecTemp = sensorList[i][t->first].spec;
+                sensorTempFile.open(getSensorPath(t->second), std::ios::in);
+                if (sensorTempFile)
+                {
+                    sensorTempFile >> sensorRealTemp;
+                }
+                sensorTempFile.close();
+                sensorMarginTemp = (sensorSpecTemp - sensorRealTemp) / 1000;
 
-            if (marginTemp == -1 || sensorMarginTemp < marginTemp)
-            {
-                marginTemp = sensorMarginTemp;
+                if (marginTemp == -1 || sensorMarginTemp < marginTemp)
+                {
+                    marginTemp = sensorMarginTemp;
+                }
             }
+            tmp = dbusSetPropertyCommand + std::to_string(sensorMarginTemp);
+            system(tmp.c_str());
+
+            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
         }
-        tmp = dbusSetPropertyCommand + std::to_string(sensorMarginTemp);
-        system(tmp.c_str());
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     }
 }
