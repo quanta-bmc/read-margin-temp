@@ -3,13 +3,8 @@
 #include <string>
 #include <vector>
 
-
-
 namespace conf
 {
-/*
- * General sensor structure used for configuration.
- */
 struct sensorConfig
 {
     int exponent;
