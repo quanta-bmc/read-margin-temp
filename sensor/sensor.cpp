@@ -10,7 +10,7 @@ std::string getSensorDeviceAddr(std::string partialPath, std::string reg)
     DIR *dir;
 
     dir = opendir(partialPath.c_str());
-    while ((drnt = readdir(dir)) != NULL) 
+    while ((drnt = readdir(dir)) != NULL)
     {
         std::string addr(drnt->d_name);
         if (addr.find(reg.c_str()) != std::string::npos)
@@ -46,19 +46,23 @@ std::string getSensorHwmonNum(std::string partialPath)
 std::string getSensorPath(struct conf::sensorConfig sensorConfig)
 {
     std::string path;
-    std::string upperPath;
-    std::string channel = "channel-";
+    std::string channel;
 
-    upperPath = sensorConfig.upperPath;
-    channel += std::to_string(sensorConfig.channel);
-
-    path = upperPath;
+    path = sensorConfig.upperPath;
+    if (sensorConfig.channel != -1)
+    {
+        channel = "channel-";
+        channel += std::to_string(sensorConfig.channel);
+        path += "/";
+        path += channel;
+    }
     path += "/";
-    path += channel;
-    path += "/";
-    path += getSensorDeviceAddr(path ,sensorConfig.reg);
-    path += "/hwmon/";
-    path += getSensorHwmonNum(path);
+    if (!sensorConfig.reg.empty())
+    {
+        path += getSensorDeviceAddr(path ,sensorConfig.reg);
+        path += "/hwmon/";
+        path += getSensorHwmonNum(path);
+    }
     path += "/";
     path += sensorConfig.lowerPath;
 
