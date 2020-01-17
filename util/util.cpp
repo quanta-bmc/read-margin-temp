@@ -5,35 +5,37 @@
 #include <map>
 #include <vector>
 
-// #include <sdbusplus/server.hpp>
-// #include <xyz/openbmc_project/Sensor/Value/server.hpp>
+#include <sdbusplus/server.hpp>
+#include <sdbusplus/bus.hpp>
+#include <sdeventplus/event.hpp>
+#include <xyz/openbmc_project/Sensor/Value/server.hpp>
 
 #include "conf.hpp"
 #include "util/util.hpp"
 #include "sensor/sensor.hpp"
+#include "dbus/dbus.hpp"
 
-// template <typename... T>
-// using ServerObject = typename sdbusplus::server::object::object<T...>;
-// using ValueObject = ServerObject<ValueInterface>;
+
 
 int getSkuNum()
 {
     int skuNum = 1;
 
-    /* code */
+    /* TBD */
 
     return skuNum;
 }
 
 void updateDbusMarginTemp(int marginTemp)
 {
-    std::string tmp;
     // auto& valueIface =
     //     std::any_cast<std::shared_ptr<ValueObject>&>(iface.second);
     // valueIface->value(value);
+    // std::string objPath = MARGIN_TEMP_PATH + "/fleeting0";
 
-    tmp = dbusSetPropertyCommand + std::to_string(marginTemp);
-    system(tmp.c_str());
+    // std::string tmp;
+    // tmp = dbusSetPropertyCommand + std::to_string(marginTemp);
+    // system(tmp.c_str());
 }
 
 void updateMarginTempLoop(
@@ -48,6 +50,8 @@ void updateMarginTempLoop(
     int sensorMarginTemp;
     int marginTemp;
     std::map<std::string, struct conf::sensorConfig> sensorList[numOfZones];
+
+    // auto nvmeSSD = std::make_shared<MarginTemp>(bus, objPath.c_str());
 
     for (int i = 0; i < numOfZones; i++)
     {

@@ -16,4 +16,5 @@ libread_margin_temp_la_LDFLAGS = -static
 libread_margin_temp_la_SOURCES = \
     json/buildjson.cpp \
     sensor/sensor.cpp \
-    util/util.cpp
+    util/util.cpp \
+    dbus/dbus.cpp
