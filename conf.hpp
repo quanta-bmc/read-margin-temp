@@ -18,4 +18,4 @@ struct sensorConfig
 };
 
 using skuConfig = std::map<int, std::map<int, std::vector<std::string>>>;
-} // namespace conf
+}

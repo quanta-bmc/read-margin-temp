@@ -5,62 +5,35 @@
 #include <map>
 #include <vector>
 
+// #include <sdbusplus/server.hpp>
+// #include <xyz/openbmc_project/Sensor/Value/server.hpp>
+
 #include "conf.hpp"
 #include "util/util.hpp"
 #include "sensor/sensor.hpp"
 
+// template <typename... T>
+// using ServerObject = typename sdbusplus::server::object::object<T...>;
+// using ValueObject = ServerObject<ValueInterface>;
+
 int getSkuNum()
 {
-    std::string fanPath;
-    std::fstream fanPwmFile;
-    std::fstream fanRpmFile;
-    bool fan6To11Control[6] = {false, false, false, false, false, false};
     int skuNum = 1;
-    int fanRpm = 0;
 
-    for (int i = 0; i < 6; i++)
-    {
-        fanPath = getFan6To11Path();
-        if (fanPath.empty())
-        {
-            return -1;
-        }
-        fanPath += "/pwm";
-        fanPath += std::to_string(i+1);
-        fanPwmFile.open(fanPath, std::ios::out);
-        fanPwmFile << 255;
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-        fanPwmFile.close();
-        fanPath = getFan6To11Path();
-        if (fanPath.empty())
-        {
-            return -1;
-        }
-        fanPath += "/fan";
-        fanPath += std::to_string(i+1);
-        fanPath += "_input";
-        fanRpmFile.open(fanPath, std::ios::in);
-        fanRpmFile >> fanRpm;
-        fanRpmFile.close();
-        if (fanRpm > 2000)
-        {
-            fan6To11Control[i] = true;
-        }
-    }
-
-    if (fan6To11Control[0])
-    {
-        if (fan6To11Control[2])
-        {
-            skuNum = 2;
-        }
-        else
-        {
-            skuNum = 3;
-        }
-    }
+    /* code */
 
     return skuNum;
+}
+
+void updateDbusMarginTemp(int marginTemp)
+{
+    std::string tmp;
+    // auto& valueIface =
+    //     std::any_cast<std::shared_ptr<ValueObject>&>(iface.second);
+    // valueIface->value(value);
+
+    tmp = dbusSetPropertyCommand + std::to_string(marginTemp);
+    system(tmp.c_str());
 }
 
 void updateMarginTempLoop(
@@ -93,23 +66,28 @@ void updateMarginTempLoop(
             {
                 sensorRealTemp = 0;
                 sensorSpecTemp = sensorList[i][t->first].spec;
-                sensorTempFile.open(getSensorPath(t->second), std::ios::in);
-                if (sensorTempFile)
+                if (sensorList[i][t->first].pathType.compare("sys") == 0)
                 {
-                    sensorTempFile >> sensorRealTemp;
+                    sensorTempFile.open(getSensorPath(t->second), std::ios::in);
+                    if (sensorTempFile)
+                    {
+                        sensorTempFile >> sensorRealTemp;
+                    }
+                    sensorTempFile.close();
                 }
-                sensorTempFile.close();
-                sensorMarginTemp = (sensorSpecTemp - sensorRealTemp) / 1000;
+                else if (sensorList[i][t->first].pathType.compare("dbus") == 0)
+                {
+                    /* code */
+                }
+                sensorMarginTemp = (sensorSpecTemp - sensorRealTemp);
 
                 if (marginTemp == -1 || sensorMarginTemp < marginTemp)
                 {
                     marginTemp = sensorMarginTemp;
                 }
             }
-            tmp = dbusSetPropertyCommand + std::to_string(sensorMarginTemp);
-            system(tmp.c_str());
 
-            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+            updateDbusMarginTemp(marginTemp);            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
         }
     }
 }

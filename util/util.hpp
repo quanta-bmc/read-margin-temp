@@ -33,6 +33,8 @@ constexpr auto dbusSetPropertyCommand =
 
 int getSkuNum();
 
+void updateDbusMarginTemp(int marginTemp);
+
 void updateMarginTempLoop(
     std::map<int, std::vector<std::string>> skuConfig,
     std::map<std::string, struct conf::sensorConfig> sensorConfig);
