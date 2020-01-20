@@ -63,6 +63,11 @@ std::string getSensorPath(struct conf::sensorConfig sensorConfig)
         path += "/hwmon/";
         path += getSensorHwmonNum(path);
     }
+    else
+    {
+        path += getSensorHwmonNum(path);
+    }
+    
     path += "/";
     path += sensorConfig.lowerPath;
 
