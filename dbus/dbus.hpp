@@ -1,38 +1,50 @@
+#pragma once
 
-
-#include <sdbusplus/server.hpp>
+#include <iostream>
+#include <string>
 #include <sdbusplus/bus.hpp>
-#include <sdeventplus/event.hpp>
-#include <xyz/openbmc_project/Sensor/Value/server.hpp>
+#include <sdbusplus/bus/match.hpp>
+#include <sdbusplus/message.hpp>
+#include <xyz/openbmc_project/Common/error.hpp>
 
-using ValueInterface = sdbusplus::xyz::openbmc_project::Sensor::server::Value;
-using MarginTempIface = 
-    sdbusplus::server::object::object<ValueInterface>;
+// using ValueInterface = sdbusplus::xyz::openbmc_project::Sensor::server::Value;
+// using MarginTempIface = 
+    //sdbusplus::server::object::object<ValueInterface>;
 
-#define MARGIN_TEMP_PATH "/xyz/openbmc_project/extsensors/margin"
+constexpr auto marginTempPath = "/xyz/openbmc_project/extsensors/margin";
+constexpr auto dbusPropertyIface = "org.freedesktop.DBus.Properties";
 
-class MarginTemp : public MarginTempIface
+namespace dbus
+{
+class SDBusPlus
 {
 public:
-    MarginTemp() = delete;
-    MarginTemp(const MarginTemp&) = delete;
-    MarginTemp& operator=(const MarginTemp&) = delete;
-    MarginTemp(MarginTemp&&) = delete;
-    MarginTemp& operator=(MarginTemp&&) = delete;
-    virtual ~MarginTemp() = default;
-
-    /** @brief Constructs MarginTemp
-     *
-     * @param[in] bus     - Handle to system dbus
-     * @param[in] objPath - The Dbus path of MarginTemp
-     */
-    MarginTemp(sdbusplus::bus::bus& bus, const char* objPath) :
-        MarginTempIface(bus, objPath), bus(bus)
+    template <typename T>
+    static auto
+        setProperty(sdbusplus::bus::bus& bus, const std::string& busName,
+            const std::string& objPath, const std::string& interface,
+            const std::string& property, const T& value)
     {
+        sdbusplus::message::variant<T> data = value;
+
+        try
+        {
+            auto methodCall = bus.new_method_call(
+                busName.c_str(), objPath.c_str(), dbusPropertyIface, "Set");
+
+            methodCall.append(interface.c_str());
+            methodCall.append(property);
+            methodCall.append(data);
+
+            auto reply = bus.call(methodCall);
+        }
+        catch (const std::exception& e)
+        {
+            std::cerr << "Set properties fail. ERROR = " << e.what()
+                      << std::endl;
+            std::cerr << "Object path = " << objPath << std::endl;
+            return;
+        }
     }
-
-    void setSensorValueToDbus(int value);
-
-private:
-    sdbusplus::bus::bus& bus;
 };
+}
