@@ -7,7 +7,9 @@
 
 int getSkuNum();
 
-void updateDbusMarginTemp(int64_t marginTemp);
+int getSensorDbusTemp(std::string sensorDbusPath);
+
+void updateDbusMarginTemp(int zoneNum, int64_t marginTemp);
 
 void updateMarginTempLoop(
     std::map<int, std::vector<std::string>> skuConfig,

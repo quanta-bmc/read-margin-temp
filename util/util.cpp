@@ -24,12 +24,26 @@ int getSkuNum()
     return skuNum;
 }
 
-void updateDbusMarginTemp(int64_t marginTemp)
+int getSensorDbusTemp(std::string sensorDbusPath)
+{
+    // sdbusplus::bus::bus bus = sdbusplus::bus::new_default();
+    // std::string INVENTORY_BUSNAME = "xyz.openbmc_project.Hwmon.external";
+    // std::string ITEM_IFACE = "xyz.openbmc_project.Sensor.Value";
+
+    // auto temp = dbus::SDBusPlus::getProperty<int>(
+    //      bus, INVENTORY_BUSNAME, sensorDbusPath, ITEM_IFACE, "Value");
+
+    return 0;
+}
+
+void updateDbusMarginTemp(int zoneNum, int64_t marginTemp)
 {
     sdbusplus::bus::bus bus = sdbusplus::bus::new_default();
     std::string INVENTORY_BUSNAME = "xyz.openbmc_project.Hwmon.external";
     std::string ITEM_IFACE = "xyz.openbmc_project.Sensor.Value";
-    std::string path = "/xyz/openbmc_project/extsensors/margin/fleeting0";
+    std::string path = "/xyz/openbmc_project/extsensors/margin/fleeting";
+
+    path += std::to_string(zoneNum);
 
     dbus::SDBusPlus::setProperty(
         bus, INVENTORY_BUSNAME, path, ITEM_IFACE, "Value", marginTemp);
@@ -76,7 +90,7 @@ void updateMarginTempLoop(
                 }
                 else if (sensorList[i][t->first].pathType.compare("dbus") == 0)
                 {
-                    /* code */
+                    sensorRealTemp = getSensorDbusTemp(sensorList[i][t->first].upperPath);
                 }
                 sensorMarginTemp = (sensorSpecTemp - sensorRealTemp);
 
@@ -86,7 +100,7 @@ void updateMarginTempLoop(
                 }
             }
 
-            updateDbusMarginTemp(marginTemp);            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+            updateDbusMarginTemp(i, marginTemp);            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
         }
     }
 }
