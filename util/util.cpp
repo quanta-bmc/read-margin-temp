@@ -26,16 +26,15 @@ int getSkuNum()
     return skuNum;
 }
 
-void updateDbusMarginTemp(int marginTemp)
+void updateDbusMarginTemp(int64_t marginTemp)
 {
-    // auto& valueIface =
-    //     std::any_cast<std::shared_ptr<ValueObject>&>(iface.second);
-    // valueIface->value(value);
-    // std::string objPath = MARGIN_TEMP_PATH + "/fleeting0";
+    sdbusplus::bus::bus bus = sdbusplus::bus::new_default();
+    std::string INVENTORY_BUSNAME = "xyz.openbmc_project.Hwmon.external";
+    std::string ITEM_IFACE = "xyz.openbmc_project.Sensor.Value";
+    std::string path = "/xyz/openbmc_project/extsensors/margin/fleeting0";
 
-    // std::string tmp;
-    // tmp = dbusSetPropertyCommand + std::to_string(marginTemp);
-    // system(tmp.c_str());
+    dbus::SDBusPlus::setProperty(
+        bus, INVENTORY_BUSNAME, path, ITEM_IFACE, "Value", marginTemp);
 }
 
 void updateMarginTempLoop(
@@ -48,10 +47,8 @@ void updateMarginTempLoop(
     int sensorRealTemp;
     int sensorSpecTemp;
     int sensorMarginTemp;
-    int marginTemp;
+    int64_t marginTemp;
     std::map<std::string, struct conf::sensorConfig> sensorList[numOfZones];
-
-    // auto nvmeSSD = std::make_shared<MarginTemp>(bus, objPath.c_str());
 
     for (int i = 0; i < numOfZones; i++)
     {

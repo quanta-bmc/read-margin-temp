@@ -59,8 +59,14 @@ conf::skuConfig getSkuInfo(const nlohmann::json& data)
         for (const auto& zone : zones)
         {
             auto id = zone["id"];
-            auto components = zone.get<std::vector<std::string>>();
-            skuZonesInfo[id] = components;
+            auto components =
+                zone["components"].get<std::vector<std::string>>();
+
+            for (const auto& i : components)
+            {
+                skuZonesInfo[id].push_back(i);
+            }
+            // skuZonesInfo[id] = components;
         }
         skusConfig[num] = skuZonesInfo;
     }

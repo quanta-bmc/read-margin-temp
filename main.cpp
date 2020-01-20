@@ -29,7 +29,7 @@ constexpr auto marginConfigPath =
 
 constexpr auto marginTempRequestName = "xyz.openbmc_project.Hwmon.external";
 
-std::map<std::string, struct conf::sensorConfig> sensorConfig;
+std::map<std::string, struct conf::sensorConfig> sensorConfig = {};
 conf::skuConfig skusConfig;
 
 void run()
@@ -59,19 +59,6 @@ void run()
 
 int main()
 {
-    sdbusplus::bus::bus bus = sdbusplus::bus::new_default();
-
-    std::string INVENTORY_BUSNAME = "xyz.openbmc_project.Hwmon.external";
-
-    std::string ITEM_IFACE = "xyz.openbmc_project.Sensor.Value";
-
-    std::string path = "/xyz/openbmc_project/extsensors/margin/fleeting0";
-
-    int64_t value = 10;
-
-    dbus::SDBusPlus::setProperty(
-        bus, INVENTORY_BUSNAME, path, ITEM_IFACE, "Value", value);
-
     run();
 
     return 0;
