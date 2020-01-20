@@ -34,9 +34,6 @@ std::map<std::string, struct conf::sensorConfig>
     std::map<std::string, struct conf::sensorConfig> config;
     auto sensors = data["sensors"];
 
-    /* TODO: If no sensors, this is invalid, and we should except here or during
-     * parsing.
-     */
     for (const auto& sensor : sensors)
     {
         config[sensor["name"]] = sensor.get<struct conf::sensorConfig>();

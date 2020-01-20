@@ -67,7 +67,7 @@ public:
             std::cerr << "Get properties fail.. ERROR = " << e.what()
                       << std::endl;
             std::cerr << "Object path = " << objPath << std::endl;
-            return false;
+            return -1;
         }
 
         return sdbusplus::message::variant_ns::get<Property>(value);

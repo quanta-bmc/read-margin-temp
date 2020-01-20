@@ -1,22 +1,9 @@
 #include <iostream>
-#include <fstream>
 #include <string>
-#include <chrono>
-#include <thread>
 #include <map>
 #include <utility>
 
 #include <nlohmann/json.hpp>
-#include <sdbusplus/bus.hpp>
-#include <sdbusplus/sdbus.hpp>
-#include <sdbusplus/server/manager.hpp>
-
-#include <sdbusplus/bus.hpp>
-#include <sdbusplus/server.hpp>
-#include <sdbusplus/server/object.hpp>
-#include <sdeventplus/clock.hpp>
-#include <sdeventplus/event.hpp>
-#include <sdeventplus/utility/timer.hpp>
 
 #include "conf.hpp"
 #include "json/buildjson.hpp"
@@ -26,8 +13,6 @@
 
 constexpr auto marginConfigPath =
     "/usr/share/read-margin-temp/config-margin.json";
-
-constexpr auto marginTempRequestName = "xyz.openbmc_project.Hwmon.external";
 
 std::map<std::string, struct conf::sensorConfig> sensorConfig = {};
 conf::skuConfig skusConfig;

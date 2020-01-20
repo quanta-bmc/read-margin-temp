@@ -26,14 +26,14 @@ int getSkuNum()
 
 int getSensorDbusTemp(std::string sensorDbusPath)
 {
-    // sdbusplus::bus::bus bus = sdbusplus::bus::new_default();
-    // std::string INVENTORY_BUSNAME = "xyz.openbmc_project.Hwmon.external";
-    // std::string ITEM_IFACE = "xyz.openbmc_project.Sensor.Value";
+    sdbusplus::bus::bus bus = sdbusplus::bus::new_default();
+    std::string INVENTORY_BUSNAME = "xyz.openbmc_project.Hwmon.external";
+    std::string ITEM_IFACE = "xyz.openbmc_project.Sensor.Value";
 
-    // auto temp = dbus::SDBusPlus::getProperty<int>(
-    //      bus, INVENTORY_BUSNAME, sensorDbusPath, ITEM_IFACE, "Value");
+    auto temp = dbus::SDBusPlus::getProperty<int>(
+         bus, INVENTORY_BUSNAME, sensorDbusPath, ITEM_IFACE, "Value");
 
-    return 0;
+    return temp;
 }
 
 void updateDbusMarginTemp(int zoneNum, int64_t marginTemp)
@@ -86,11 +86,20 @@ void updateMarginTempLoop(
                     {
                         sensorTempFile >> sensorRealTemp;
                     }
+                    else
+                    {
+                        break;
+                    }
+                    
                     sensorTempFile.close();
                 }
                 else if (sensorList[i][t->first].pathType.compare("dbus") == 0)
                 {
                     sensorRealTemp = getSensorDbusTemp(sensorList[i][t->first].upperPath);
+                    if (sensorRealTemp == -1)
+                    {
+                        break;
+                    }
                 }
                 sensorMarginTemp = (sensorSpecTemp - sensorRealTemp);
 
