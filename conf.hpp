@@ -10,6 +10,7 @@ struct sensorConfig
 {
     int exponent;
     std::string pathType;
+    std::string busName;
     std::string upperPath;
     std::string lowerPath;
     int channel;

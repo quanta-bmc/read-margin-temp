@@ -7,7 +7,6 @@
 
 #include <sdbusplus/server.hpp>
 #include <sdbusplus/bus.hpp>
-#include <sdeventplus/event.hpp>
 #include <xyz/openbmc_project/Sensor/Value/server.hpp>
 
 #include "conf.hpp"
@@ -24,14 +23,13 @@ int getSkuNum()
     return skuNum;
 }
 
-int getSensorDbusTemp(std::string sensorDbusPath)
+int getSensorDbusTemp(std::string busName, std::string sensorDbusPath)
 {
     sdbusplus::bus::bus bus = sdbusplus::bus::new_default();
-    std::string INVENTORY_BUSNAME = "xyz.openbmc_project.Hwmon.external";
-    std::string ITEM_IFACE = "xyz.openbmc_project.Sensor.Value";
+    std::string itemIface = "xyz.openbmc_project.Sensor.Value";
 
     auto temp = dbus::SDBusPlus::getProperty<int>(
-         bus, INVENTORY_BUSNAME, sensorDbusPath, ITEM_IFACE, "Value");
+        bus, busName, sensorDbusPath, itemIface, "Value");
 
     return temp;
 }
@@ -40,13 +38,13 @@ void updateDbusMarginTemp(int zoneNum, int64_t marginTemp)
 {
     sdbusplus::bus::bus bus = sdbusplus::bus::new_default();
     std::string INVENTORY_BUSNAME = "xyz.openbmc_project.Hwmon.external";
-    std::string ITEM_IFACE = "xyz.openbmc_project.Sensor.Value";
+    std::string itemIface = "xyz.openbmc_project.Sensor.Value";
     std::string path = "/xyz/openbmc_project/extsensors/margin/fleeting";
 
     path += std::to_string(zoneNum);
 
     dbus::SDBusPlus::setProperty(
-        bus, INVENTORY_BUSNAME, path, ITEM_IFACE, "Value", marginTemp);
+        bus, INVENTORY_BUSNAME, path, itemIface, "Value", marginTemp);
 }
 
 void updateMarginTempLoop(
@@ -74,7 +72,7 @@ void updateMarginTempLoop(
     {
         for (int i = 0; i < numOfZones; i++)
         {
-            marginTemp = -1;
+            marginTemp = 0;
             for (auto t = sensorList[i].begin(); t != sensorList[i].end(); t++)
             {
                 sensorRealTemp = 0;
@@ -95,7 +93,9 @@ void updateMarginTempLoop(
                 }
                 else if (sensorList[i][t->first].pathType.compare("dbus") == 0)
                 {
-                    sensorRealTemp = getSensorDbusTemp(sensorList[i][t->first].upperPath);
+                    sensorRealTemp = 
+                        getSensorDbusTemp(sensorList[i][t->first].busName,
+                            sensorList[i][t->first].upperPath);
                     if (sensorRealTemp == -1)
                     {
                         break;
@@ -103,7 +103,7 @@ void updateMarginTempLoop(
                 }
                 sensorMarginTemp = (sensorSpecTemp - sensorRealTemp);
 
-                if (marginTemp == -1 || sensorMarginTemp < marginTemp)
+                if (marginTemp == 0 || sensorMarginTemp < marginTemp)
                 {
                     marginTemp = sensorMarginTemp;
                 }

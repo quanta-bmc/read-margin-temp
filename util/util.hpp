@@ -8,7 +8,7 @@
 
 int getSkuNum();
 
-int getSensorDbusTemp(std::string sensorDbusPath);
+int getSensorDbusTemp(std::string busName, std::string sensorDbusPath);
 
 void updateDbusMarginTemp(int zoneNum, int64_t marginTemp);
 

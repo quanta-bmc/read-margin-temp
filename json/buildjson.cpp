@@ -14,6 +14,7 @@ void from_json(const nlohmann::json& jsonData, conf::sensorConfig& configItem)
 {
     jsonData.at("exponent").get_to(configItem.exponent);
     jsonData.at("pathType").get_to(configItem.pathType);
+    jsonData.at("busName").get_to(configItem.busName);
     jsonData.at("upperPath").get_to(configItem.upperPath);
     jsonData.at("lowerPath").get_to(configItem.lowerPath);
     jsonData.at("channel").get_to(configItem.channel);
