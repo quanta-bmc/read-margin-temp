@@ -66,7 +66,6 @@ conf::skuConfig getSkuInfo(const nlohmann::json& data)
             {
                 skuZonesInfo[id].push_back(i);
             }
-            // skuZonesInfo[id] = components;
         }
         skusConfig[num] = skuZonesInfo;
     }
@@ -76,38 +75,33 @@ conf::skuConfig getSkuInfo(const nlohmann::json& data)
 
 void validateJson(const nlohmann::json& data)
 {
-    // if (data.count("sensors") != 1)
-    // {
-    //     throw ConfigurationException(
-    //         "KeyError: 'sensors' not found (or found repeatedly)");
-    // }
+    if (data.count("sensors") != 1)
+    {
+        throw "KeyError: 'sensors' not found (or found repeatedly)";
+    }
 
-    // if (data["sensors"].size() == 0)
-    // {
-    //     throw ConfigurationException(
-    //         "Invalid Configuration: At least one sensor required");
-    // }
+    if (data["sensors"].size() == 0)
+    {
+        throw "Invalid Configuration: At least one sensor required";
+    }
 
-    // if (data.count("skus") != 1)
-    // {
-    //     throw ConfigurationException(
-    //         "KeyError: 'skus' not found (or found repeatedly)");
-    // }
+    if (data.count("skus") != 1)
+    {
+        throw "KeyError: 'skus' not found (or found repeatedly)";
+    }
 
-    // for (const auto& sku : data["skus"])
-    // {
-    //     if (sku.count("zones") != 1)
-    //     {
-    //         throw ConfigurationException(
-    //             "KeyError: should only have one 'zones' key per sku.");
-    //     }
+    for (const auto& sku : data["skus"])
+    {
+        if (sku.count("zones") != 1)
+        {
+            throw "KeyError: should only have one 'zones' key per sku.";
+        }
 
-    //     if (sku["zones"].size() == 0)
-    //     {
-    //         throw ConfigurationException(
-    //             "Invalid Configuration: must be at least one zones per sku.");
-    //     }
-    // }
+        if (sku["zones"].size() == 0)
+        {
+            throw "Invalid Configuration: must be at least one zones per sku.";
+        }
+    }
 }
 
 nlohmann::json parseValidateJson(const std::string& path)
@@ -116,12 +110,14 @@ nlohmann::json parseValidateJson(const std::string& path)
     if (!jsonFile.is_open())
     {
         std::cerr << "Unable to open json file" << std::endl;
+        throw;
     }
 
     auto data = nlohmann::json::parse(jsonFile, nullptr, false);
     if (data.is_discarded())
     {
         std::cerr << "Invalid json - parse failed" << std::endl;
+        throw;
     }
 
     /* Check the data. */

@@ -7,10 +7,6 @@
 #include <sdbusplus/message.hpp>
 #include <xyz/openbmc_project/Common/error.hpp>
 
-// using ValueInterface = sdbusplus::xyz::openbmc_project::Sensor::server::Value;
-// using MarginTempIface = 
-    //sdbusplus::server::object::object<ValueInterface>;
-
 constexpr auto marginTempPath = "/xyz/openbmc_project/extsensors/margin";
 constexpr auto dbusPropertyIface = "org.freedesktop.DBus.Properties";
 
@@ -41,7 +37,7 @@ public:
         catch (const std::exception& e)
         {
             std::cerr << "Set properties fail. ERROR = " << e.what()
-                      << std::endl;
+                << std::endl;
             std::cerr << "Object path = " << objPath << std::endl;
             return;
         }

@@ -15,8 +15,6 @@
 #include "sensor/sensor.hpp"
 #include "dbus/dbus.hpp"
 
-
-
 int getSkuNum()
 {
     int skuNum = 1;
