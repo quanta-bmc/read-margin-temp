@@ -23,28 +23,68 @@ int getSkuNum()
     return skuNum;
 }
 
-int getSensorDbusTemp(std::string busName, std::string sensorDbusPath)
+int getSensorDbusTemp(std::string sensorDbusPath)
 {
     sdbusplus::bus::bus bus = sdbusplus::bus::new_default();
+    std::string service = getService(sensorDbusPath);
     std::string itemIface = "xyz.openbmc_project.Sensor.Value";
 
+    if (service.empty())
+    {
+        return -1;
+    }
+
     auto temp = dbus::SDBusPlus::getProperty<int>(
-        bus, busName, sensorDbusPath, itemIface, "Value");
+        bus, service, sensorDbusPath, itemIface, "Value");
 
     return temp;
+}
+
+std::string getService(const std::string path)
+{
+    auto bus = sdbusplus::bus::new_system();
+    auto mapper =
+        bus.new_method_call("xyz.openbmc_project.ObjectMapper",
+                            "/xyz/openbmc_project/object_mapper",
+                            "xyz.openbmc_project.ObjectMapper", "GetObject");
+
+    mapper.append(path);
+    mapper.append(std::vector<std::string>({"xyz.openbmc_project.Sensor.Value"}));
+
+    std::map<std::string, std::vector<std::string>> response;
+
+    try
+    {
+        auto responseMsg = bus.call(mapper);
+
+        responseMsg.read(response);
+    }
+    catch (const sdbusplus::exception::SdBusError& ex)
+    {
+        return "";
+    }
+
+    if (response.begin() == response.end())
+    {
+        return "";
+    }
+
+    std::cout << response.begin()->first << std::endl;
+
+    return response.begin()->first;
 }
 
 void updateDbusMarginTemp(int zoneNum, int64_t marginTemp)
 {
     sdbusplus::bus::bus bus = sdbusplus::bus::new_default();
-    std::string INVENTORY_BUSNAME = "xyz.openbmc_project.Hwmon.external";
+    std::string service = "xyz.openbmc_project.Hwmon.external";
     std::string itemIface = "xyz.openbmc_project.Sensor.Value";
     std::string path = "/xyz/openbmc_project/extsensors/margin/fleeting";
 
     path += std::to_string(zoneNum);
 
     dbus::SDBusPlus::setProperty(
-        bus, INVENTORY_BUSNAME, path, itemIface, "Value", marginTemp);
+        bus, service, path, itemIface, "Value", marginTemp);
 }
 
 void updateMarginTempLoop(
@@ -94,8 +134,7 @@ void updateMarginTempLoop(
                 else if (sensorList[i][t->first].pathType.compare("dbus") == 0)
                 {
                     sensorRealTemp = 
-                        getSensorDbusTemp(sensorList[i][t->first].busName,
-                            sensorList[i][t->first].upperPath);
+                        getSensorDbusTemp(sensorList[i][t->first].upperPath);
                     if (sensorRealTemp == -1)
                     {
                         break;
