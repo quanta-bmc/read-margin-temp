@@ -34,7 +34,7 @@ int getSensorDbusTemp(std::string sensorDbusPath)
         return -1;
     }
 
-    auto temp = dbus::SDBusPlus::getProperty<int>(
+    auto temp = dbus::SDBusPlus::getProperty(
         bus, service, sensorDbusPath, itemIface, "Value");
 
     return temp;
@@ -68,8 +68,6 @@ std::string getService(const std::string path)
     {
         return "";
     }
-
-    std::cout << response.begin()->first << std::endl;
 
     return response.begin()->first;
 }
@@ -135,16 +133,16 @@ void updateMarginTempLoop(
                 {
                     sensorRealTemp = 
                         getSensorDbusTemp(sensorList[i][t->first].upperPath);
-                    if (sensorRealTemp == -1)
-                    {
-                        break;
-                    }
                 }
-                sensorMarginTemp = (sensorSpecTemp - sensorRealTemp);
 
-                if (marginTemp == 0 || sensorMarginTemp < marginTemp)
+                if (sensorRealTemp != -1)
                 {
-                    marginTemp = sensorMarginTemp;
+                    sensorMarginTemp = (sensorSpecTemp - sensorRealTemp);
+
+                    if (marginTemp == 0 || sensorMarginTemp < marginTemp)
+                    {
+                        marginTemp = sensorMarginTemp;
+                    }
                 }
             }
 

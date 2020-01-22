@@ -4,13 +4,35 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <variant>
+
 #include <sdbusplus/bus.hpp>
 #include <sdbusplus/bus/match.hpp>
 #include <sdbusplus/message.hpp>
 #include <xyz/openbmc_project/Common/error.hpp>
 
+using propertyMap = 
+    std::map<std::string, std::variant<int64_t, double, std::string, bool>>;
+
 constexpr auto marginTempPath = "/xyz/openbmc_project/extsensors/margin";
 constexpr auto dbusPropertyIface = "org.freedesktop.DBus.Properties";
+
+struct variantToDouble
+{
+    template <typename T>
+    std::enable_if_t<std::is_arithmetic<T>::value, double>
+        operator()(const T& t) const
+    {
+        return static_cast<double>(t);
+    }
+
+    template <typename T>
+    std::enable_if_t<!std::is_arithmetic<T>::value, double>
+        operator()(const T& t) const
+    {
+        throw ;
+    }
+};
 
 namespace dbus
 {
@@ -45,34 +67,29 @@ public:
         }
     }
 
-    template <typename Property>
-    static auto
-        getProperty(sdbusplus::bus::bus& bus, const std::string& busName,
-                    const std::string& objPath, const std::string& interface,
-                    const std::string& property)
+    static double getProperty(sdbusplus::bus::bus& bus,
+        const std::string& service, const std::string& path,
+        const std::string& interface, const std::string& property)
     {
-        auto methodCall = bus.new_method_call(busName.c_str(), objPath.c_str(),
-            dbusPropertyIface, "Get");
+        auto pimMsg = bus.new_method_call(service.c_str(), path.c_str(),
+                                        dbusPropertyIface, "GetAll");
 
-        methodCall.append(interface.c_str());
-        methodCall.append(property);
+        pimMsg.append(interface.c_str());
 
-        sdbusplus::message::variant<Property> value;
+        propertyMap propMap;
 
         try
         {
-            auto reply = bus.call(methodCall);
-            reply.read(value);
+            auto valueResponseMsg = bus.call(pimMsg);
+            valueResponseMsg.read(propMap);
         }
-        catch (const std::exception& e)
+        catch (const sdbusplus::exception::SdBusError& ex)
         {
-            std::cerr << "Get properties fail.. ERROR = " << e.what()
-                      << std::endl;
-            std::cerr << "Object path = " << objPath << std::endl;
             return -1;
         }
 
-        return sdbusplus::message::variant_ns::get<Property>(value);
+        return std::visit(variantToDouble(), propMap[property]);
     }
+
 };
 }
