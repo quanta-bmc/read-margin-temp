@@ -17,7 +17,7 @@ using propertyMap =
 constexpr auto marginTempPath = "/xyz/openbmc_project/extsensors/margin";
 constexpr auto dbusPropertyIface = "org.freedesktop.DBus.Properties";
 
-struct variantToDouble
+struct variantToDoubleVisitor
 {
     template <typename T>
     std::enable_if_t<std::is_arithmetic<T>::value, double>
@@ -88,7 +88,7 @@ public:
             return -1;
         }
 
-        return std::visit(variantToDouble(), propMap[property]);
+        return std::visit(variantToDoubleVisitor(), propMap[property]);
     }
 
 };

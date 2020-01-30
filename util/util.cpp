@@ -153,6 +153,11 @@ void updateMarginTempLoop(
                         getSensorDbusTemp(sensorList[i][t->first].path);
                 }
 
+                if (sensorList[i][t->first].unit.compare("degree") == 0)
+                {
+                    sensorRealTemp *= 1000;
+                }
+
                 if (sensorRealTemp != -1)
                 {
                     sensorMarginTemp = (sensorSpecTemp - sensorRealTemp);
