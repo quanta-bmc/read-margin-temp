@@ -12,6 +12,8 @@ std::string getService(const std::string path);
 
 int getSensorDbusTemp(std::string sensorDbusPath);
 
+int getSpecTemp();
+
 void updateDbusMarginTemp(int zoneNum, int64_t marginTemp);
 
 void updateMarginTempLoop(

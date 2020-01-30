@@ -40,6 +40,15 @@ int getSensorDbusTemp(std::string sensorDbusPath)
     return temp;
 }
 
+int getSpecTemp()
+{
+    int specTemp = 0;
+
+    /* TBD */
+
+    return specTemp;
+}
+
 std::string getService(const std::string path)
 {
     auto bus = sdbusplus::bus::new_system();
@@ -115,7 +124,15 @@ void updateMarginTempLoop(
             for (auto t = sensorList[i].begin(); t != sensorList[i].end(); t++)
             {
                 sensorRealTemp = 0;
-                sensorSpecTemp = sensorList[i][t->first].spec;
+                if (sensorList[i][t->first].spec == -1)
+                {
+                    sensorSpecTemp = getSpecTemp();
+                }
+                else
+                {
+                    sensorSpecTemp = sensorList[i][t->first].spec;
+                }
+
                 if (sensorList[i][t->first].pathType.compare("sys") == 0)
                 {
                     sensorTempFile.open(getSensorPath(t->second), std::ios::in);
