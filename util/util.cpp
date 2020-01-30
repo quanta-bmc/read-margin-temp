@@ -150,7 +150,8 @@ void updateMarginTempLoop(
                 }
             }
 
-            updateDbusMarginTemp(i, marginTemp);            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+            updateDbusMarginTemp(i, calibMarginTemp);
+            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
         }
     }
 }
