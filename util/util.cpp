@@ -95,7 +95,8 @@ void updateMarginTempLoop(
     int sensorRealTemp;
     int sensorSpecTemp;
     int sensorMarginTemp;
-    int64_t marginTemp;
+    int sensorCalibTemp;
+    int64_t calibMarginTemp;
     std::map<std::string, struct conf::sensorConfig> sensorList[numOfZones];
 
     for (int i = 0; i < numOfZones; i++)
@@ -110,7 +111,7 @@ void updateMarginTempLoop(
     {
         for (int i = 0; i < numOfZones; i++)
         {
-            marginTemp = 0;
+            calibMarginTemp = 0;
             for (auto t = sensorList[i].begin(); t != sensorList[i].end(); t++)
             {
                 sensorRealTemp = 0;
@@ -132,16 +133,19 @@ void updateMarginTempLoop(
                 else if (sensorList[i][t->first].pathType.compare("dbus") == 0)
                 {
                     sensorRealTemp = 
-                        getSensorDbusTemp(sensorList[i][t->first].upperPath);
+                        getSensorDbusTemp(sensorList[i][t->first].path);
                 }
 
                 if (sensorRealTemp != -1)
                 {
                     sensorMarginTemp = (sensorSpecTemp - sensorRealTemp);
+                    sensorCalibTemp = sensorMarginTemp;
+                    sensorCalibTemp += sensorList[i][t->first].offset;
 
-                    if (marginTemp == 0 || sensorMarginTemp < marginTemp)
+                    if (calibMarginTemp == 0 ||
+                        sensorMarginTemp < calibMarginTemp)
                     {
-                        marginTemp = sensorMarginTemp;
+                        calibMarginTemp = sensorCalibTemp;
                     }
                 }
             }

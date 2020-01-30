@@ -8,12 +8,13 @@ namespace conf
 {
 struct sensorConfig
 {
-    int exponent;
+    std::string unit;
     std::string pathType;
-    std::string upperPath;
-    std::string lowerPath;
-    int channel;
-    std::string reg;
+    std::string path;
+    std::string sysInput;
+    int sysChannel;
+    std::string sysReg;
+    int offset;
     int spec;
 };
 

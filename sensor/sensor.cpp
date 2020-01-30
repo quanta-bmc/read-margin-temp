@@ -48,18 +48,18 @@ std::string getSensorPath(struct conf::sensorConfig sensorConfig)
     std::string path;
     std::string channel;
 
-    path = sensorConfig.upperPath;
-    if (sensorConfig.channel != -1)
+    path = sensorConfig.path;
+    if (sensorConfig.sysChannel != -1)
     {
         channel = "channel-";
-        channel += std::to_string(sensorConfig.channel);
+        channel += std::to_string(sensorConfig.sysChannel);
         path += "/";
         path += channel;
     }
     path += "/";
-    if (!sensorConfig.reg.empty())
+    if (!sensorConfig.sysReg.empty())
     {
-        path += getSensorDeviceAddr(path ,sensorConfig.reg);
+        path += getSensorDeviceAddr(path ,sensorConfig.sysReg);
         path += "/hwmon/";
         path += getSensorHwmonNum(path);
     }
@@ -69,7 +69,7 @@ std::string getSensorPath(struct conf::sensorConfig sensorConfig)
     }
     
     path += "/";
-    path += sensorConfig.lowerPath;
+    path += sensorConfig.sysInput;
 
     return path;
 }

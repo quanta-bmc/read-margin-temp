@@ -18,7 +18,7 @@ std::map<std::string, struct conf::sensorConfig> sensorConfig = {};
 conf::skuConfig skusConfig;
 
 void run()
-{ 
+{
     std::map<int, std::vector<std::string>> skuConfig;
     int skuNum;
 
