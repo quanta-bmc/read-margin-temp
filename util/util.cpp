@@ -156,6 +156,7 @@ void updateMarginTempLoop(
                 if (sensorList[i][t->first].unit.compare("degree") == 0)
                 {
                     sensorRealTemp *= 1000;
+                    sensorSpecTemp *= 1000;
                 }
 
                 if (sensorRealTemp != -1)
