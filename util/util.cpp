@@ -27,15 +27,13 @@ int getSensorDbusTemp(std::string sensorDbusPath)
 {
     sdbusplus::bus::bus bus = sdbusplus::bus::new_default();
     std::string service = getService(sensorDbusPath);
-    std::string itemIface = "xyz.openbmc_project.Sensor.Value";
 
     if (service.empty())
     {
         return -1;
     }
 
-    auto temp = dbus::SDBusPlus::getProperty(
-        bus, service, sensorDbusPath, itemIface, "Value");
+    auto temp = dbus::SDBusPlus::getValueProperty(bus, service, sensorDbusPath);
 
     return temp;
 }
@@ -65,7 +63,6 @@ std::string getService(const std::string path)
     try
     {
         auto responseMsg = bus.call(mapper);
-
         responseMsg.read(response);
     }
     catch (const sdbusplus::exception::SdBusError& ex)
@@ -85,13 +82,11 @@ void updateDbusMarginTemp(int zoneNum, int64_t marginTemp)
 {
     sdbusplus::bus::bus bus = sdbusplus::bus::new_default();
     std::string service = "xyz.openbmc_project.Hwmon.external";
-    std::string itemIface = "xyz.openbmc_project.Sensor.Value";
     std::string path = "/xyz/openbmc_project/extsensors/margin/fleeting";
 
     path += std::to_string(zoneNum);
 
-    dbus::SDBusPlus::setProperty(
-        bus, service, path, itemIface, "Value", marginTemp);
+    dbus::SDBusPlus::setValueProperty(bus, service, path, marginTemp);
 }
 
 void updateMarginTempLoop(

@@ -11,11 +11,12 @@
 #include <sdbusplus/message.hpp>
 #include <xyz/openbmc_project/Common/error.hpp>
 
-using propertyMap = 
+using propertyMap =
     std::map<std::string, std::variant<int64_t, double, std::string, bool>>;
 
-constexpr auto marginTempPath = "/xyz/openbmc_project/extsensors/margin";
-constexpr auto dbusPropertyIface = "org.freedesktop.DBus.Properties";
+constexpr auto dbusPropertyInterface = "org.freedesktop.DBus.Properties";
+constexpr auto valueInterface = "xyz.openbmc_project.Sensor.Value";
+constexpr auto valueProperty = "Value";
 
 struct variantToDoubleVisitor
 {
@@ -39,21 +40,19 @@ namespace dbus
 class SDBusPlus
 {
 public:
-    template <typename T>
     static auto
-        setProperty(sdbusplus::bus::bus& bus, const std::string& busName,
-            const std::string& objPath, const std::string& interface,
-            const std::string& property, const T& value)
+        setValueProperty(sdbusplus::bus::bus& bus, const std::string& busName,
+            const std::string& objPath, const int64_t& value)
     {
-        sdbusplus::message::variant<T> data = value;
+        sdbusplus::message::variant<int64_t> data = value;
 
         try
         {
             auto methodCall = bus.new_method_call(
-                busName.c_str(), objPath.c_str(), dbusPropertyIface, "Set");
+                busName.c_str(), objPath.c_str(), dbusPropertyInterface, "Set");
 
-            methodCall.append(interface.c_str());
-            methodCall.append(property);
+            methodCall.append(valueInterface);
+            methodCall.append(valueProperty);
             methodCall.append(data);
 
             auto reply = bus.call(methodCall);
@@ -62,33 +61,29 @@ public:
         {
             std::cerr << "Set properties fail. ERROR = " << e.what()
                 << std::endl;
-            std::cerr << "Object path = " << objPath << std::endl;
             return;
         }
     }
 
-    static double getProperty(sdbusplus::bus::bus& bus,
-        const std::string& service, const std::string& path,
-        const std::string& interface, const std::string& property)
+    static double getValueProperty(sdbusplus::bus::bus& bus,
+        const std::string& service, const std::string& path)
     {
-        auto pimMsg = bus.new_method_call(service.c_str(), path.c_str(),
-                                        dbusPropertyIface, "GetAll");
-
-        pimMsg.append(interface.c_str());
-
         propertyMap propMap;
+        auto pimMsg = bus.new_method_call(service.c_str(), path.c_str(),
+            dbusPropertyInterface, "GetAll");
+        pimMsg.append(valueInterface);
 
         try
         {
             auto valueResponseMsg = bus.call(pimMsg);
             valueResponseMsg.read(propMap);
         }
-        catch (const sdbusplus::exception::SdBusError& ex)
+        catch (const std::exception& e)
         {
             return -1;
         }
 
-        return std::visit(variantToDoubleVisitor(), propMap[property]);
+        return std::visit(variantToDoubleVisitor(), propMap[valueProperty]);
     }
 
 };
