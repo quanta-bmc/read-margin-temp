@@ -16,24 +16,6 @@ using propertyMap =
 
 constexpr auto dbusPropertyInterface = "org.freedesktop.DBus.Properties";
 constexpr auto valueInterface = "xyz.openbmc_project.Sensor.Value";
-constexpr auto valueProperty = "Value";
-
-struct variantToDoubleVisitor
-{
-    template <typename T>
-    std::enable_if_t<std::is_arithmetic<T>::value, double>
-        operator()(const T& t) const
-    {
-        return static_cast<double>(t);
-    }
-
-    template <typename T>
-    std::enable_if_t<!std::is_arithmetic<T>::value, double>
-        operator()(const T& t) const
-    {
-        throw ;
-    }
-};
 
 namespace dbus
 {
@@ -52,20 +34,19 @@ public:
                 busName.c_str(), objPath.c_str(), dbusPropertyInterface, "Set");
 
             methodCall.append(valueInterface);
-            methodCall.append(valueProperty);
+            methodCall.append("Value");
             methodCall.append(data);
 
             auto reply = bus.call(methodCall);
         }
         catch (const std::exception& e)
         {
-            std::cerr << "Set properties fail. ERROR = " << e.what()
-                << std::endl;
+            std::cerr << "Set dbus properties fail. " << e.what() << std::endl;
             return;
         }
     }
 
-    static double getValueProperty(sdbusplus::bus::bus& bus,
+    static int getValueProperty(sdbusplus::bus::bus& bus,
         const std::string& service, const std::string& path)
     {
         propertyMap propMap;
@@ -80,11 +61,11 @@ public:
         }
         catch (const std::exception& e)
         {
+            std::cerr << "Get dbus properties fail. " << e.what() << std::endl;
             return -1;
         }
 
-        return std::visit(variantToDoubleVisitor(), propMap[valueProperty]);
+        return std::get<int64_t>(propMap["Value"]);
     }
-
 };
 }
