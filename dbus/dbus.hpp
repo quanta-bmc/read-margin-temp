@@ -9,7 +9,6 @@
 #include <sdbusplus/bus.hpp>
 #include <sdbusplus/bus/match.hpp>
 #include <sdbusplus/message.hpp>
-#include <xyz/openbmc_project/Common/error.hpp>
 
 using propertyMap =
     std::map<std::string, std::variant<int64_t, double, std::string, bool>>;

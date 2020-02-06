@@ -14,7 +14,6 @@ executable(
         'sensor/sensor.cpp',
         'util/util.cpp',
         'json/buildjson.cpp',
-        'dbus/dbus.cpp',
     ],
     dependencies: [
         dependency('sdbusplus'),
