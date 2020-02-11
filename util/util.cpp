@@ -40,7 +40,7 @@ int getSensorDbusTemp(std::string sensorDbusPath)
 
 int getSpecTemp(struct conf::sensorConfig config)
 {
-    if (config.spec->specTemp != -1)
+    if (config.specTemp != -1)
     {
         return config.specTemp;
     }
@@ -137,14 +137,14 @@ void updateMarginTempLoop(
             for (auto t = sensorList[i].begin(); t != sensorList[i].end(); t++)
             {
                 sensorRealTemp = 0;
-                if (sensorList[i][t->first].spec->specTemp == -1)
+                if (sensorList[i][t->first].specTemp == -1)
                 {
                     sensorSpecTemp =
                         getSpecTemp(sensorList[i][t->first]);
                 }
                 else
                 {
-                    sensorSpecTemp = sensorList[i][t->first].spec->specTemp;
+                    sensorSpecTemp = sensorList[i][t->first].specTemp;
                 }
 
                 if (sensorList[i][t->first].pathType.compare("sys") == 0)
