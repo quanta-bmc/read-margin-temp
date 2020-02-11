@@ -18,7 +18,7 @@ struct sensorConfig
     int sysChannel;
     std::string sysReg;
     int offset;
-    specInfo spec;
+    struct specInfo spec;
 };
 
 struct specInfo
