@@ -8,7 +8,7 @@
 
 int getSkuNum();
 
-std::string getService(const std::string path);
+std::string getService(const std::string dbusPath);
 
 int getSensorDbusTemp(std::string sensorDbusPath);
 

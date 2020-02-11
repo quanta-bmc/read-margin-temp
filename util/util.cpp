@@ -151,7 +151,7 @@ void updateMarginTempLoop(
                 else if (sensorList[i][t->first].pathType.compare("dbus") == 0)
                 {
                     sensorRealTemp = 
-                        getSensorDbusTemp(sensorList[i][t->first].path);
+                        getSensorDbusTemp(sensorList[i][t->first].dbusPath);
                 }
 
                 if (sensorList[i][t->first].unit.compare("degree") == 0)
