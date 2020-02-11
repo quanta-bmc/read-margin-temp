@@ -31,7 +31,7 @@ void run()
     }
 
     /** determine sku **/
-    auto skuNum = getSkuNum();
+    int skuNum = getSkuNum();
 
     /** get sku info **/
     auto skuConfig = skusConfig[skuNum];

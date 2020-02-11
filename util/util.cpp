@@ -16,18 +16,16 @@
 
 int getSkuNum()
 {
-    int skuNum = 1;
-
     /* TO DO:
      * The method of determining sku is not yet known.
      */
 
-    return skuNum;
+    return 1;
 }
 
 int getSensorDbusTemp(std::string sensorDbusPath)
 {
-    sdbusplus::bus::bus bus = sdbusplus::bus::new_default();
+    auto bus = sdbusplus::bus::new_default();
     std::string service = getService(sensorDbusPath);
 
     if (service.empty())
@@ -85,7 +83,7 @@ std::string getService(const std::string path)
 
 void updateDbusMarginTemp(int zoneNum, int64_t marginTemp)
 {
-    sdbusplus::bus::bus bus = sdbusplus::bus::new_default();
+    auto bus = sdbusplus::bus::new_default();
     std::string service = "xyz.openbmc_project.Hwmon.external";
     std::string path = "/xyz/openbmc_project/extsensors/margin/fleeting";
 
@@ -99,7 +97,6 @@ void updateMarginTempLoop(
     std::map<std::string, struct conf::sensorConfig> sensorConfig)
 {
     std::fstream sensorTempFile;
-    std::string tmp;
     int numOfZones = skuConfig.size();
     int sensorRealTemp;
     int sensorSpecTemp;

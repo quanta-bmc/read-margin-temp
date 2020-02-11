@@ -7,9 +7,8 @@ struct dirent *drnt;
 
 std::string getSensorDeviceAddr(std::string partialPath, std::string reg)
 {
-    DIR *dir;
+    auto dir = opendir(partialPath.c_str());
 
-    dir = opendir(partialPath.c_str());
     while ((drnt = readdir(dir)) != NULL)
     {
         std::string addr(drnt->d_name);
@@ -26,9 +25,8 @@ std::string getSensorDeviceAddr(std::string partialPath, std::string reg)
 
 std::string getSensorHwmonNum(std::string partialPath)
 {
-    DIR *dir;
+    auto dir = opendir(partialPath.c_str());
 
-    dir = opendir(partialPath.c_str());
     while ((drnt = readdir(dir)) != NULL) 
     {
         std::string hwmonNum(drnt->d_name);
@@ -45,13 +43,16 @@ std::string getSensorHwmonNum(std::string partialPath)
 
 std::string getSensorPath(struct conf::sensorConfig sensorConfig)
 {
-    std::string path;
-    std::string channel;
+    if (sensorConfig.pathType == "dbus")
+    {
+        return sensorConfig.dbusPath;
+    }
 
-    path = sensorConfig.path;
+    std::string path = sensorConfig.sysPath;
+    std::string channel = "channel-";
+
     if (sensorConfig.sysChannel != -1)
     {
-        channel = "channel-";
         channel += std::to_string(sensorConfig.sysChannel);
         path += "/";
         path += channel;
@@ -67,7 +68,7 @@ std::string getSensorPath(struct conf::sensorConfig sensorConfig)
     {
         path += getSensorHwmonNum(path);
     }
-    
+
     path += "/";
     path += sensorConfig.sysInput;
 
