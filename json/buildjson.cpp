@@ -24,12 +24,12 @@ void from_json(const nlohmann::json& jsonData, conf::sensorConfig& configItem)
     jsonData.at("offset").get_to(configItem.offset);
 
     auto spec = jsonData.at("spec");
-    spec.at("type").get_to(configItem.spec->type);
-    spec.at("specTemp").get_to(configItem.spec->specTemp);
-    spec.at("sysPath").get_to(configItem.spec->sysPath);
-    spec.at("sysInput").get_to(configItem.spec->sysInput);
-    spec.at("sysChannel").get_to(configItem.spec->sysChannel);
-    spec.at("sysReg").get_to(configItem.spec->sysReg);
+    spec.at("type").get_to(configItem.specType);
+    spec.at("specTemp").get_to(configItem.specTemp);
+    spec.at("sysPath").get_to(configItem.specSysPath);
+    spec.at("sysInput").get_to(configItem.specSysInput);
+    spec.at("sysChannel").get_to(configItem.specSysChannel);
+    spec.at("sysReg").get_to(configItem.specSysReg);
 }
 
 void from_json(

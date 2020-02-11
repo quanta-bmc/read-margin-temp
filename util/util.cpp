@@ -42,18 +42,18 @@ int getSpecTemp(struct conf::sensorConfig config)
 {
     if (config.spec->specTemp != -1)
     {
-        return config.spec->specTemp;
+        return config.specTemp;
     }
 
     int specTemp = -1;
 
-    if (config.spec->type == "sys")
+    if (config.specType == "sys")
     {
         std::fstream sensorSpecFile;
         std::string path;
 
-        path = getSysPath(config.spec->sysPath, config.spec->sysInput, 
-            config.spec->sysChannel, config.spec->sysReg);
+        path = getSysPath(config.specSysPath, config.specSysInput, 
+            config.specSysChannel, config.specSysReg);
         sensorSpecFile.open(path, std::ios::in);
         if (sensorSpecFile)
         {
