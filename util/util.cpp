@@ -46,7 +46,7 @@ int getSpecTemp(struct conf::sensorConfig config)
 
     if (config.sensorType == "cpu")
     {
-        continue;
+        return 105000;
     }
 
     return specTemp;
