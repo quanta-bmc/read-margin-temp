@@ -1,7 +1,6 @@
 #include <iostream>
 #include <string>
 #include <map>
-#include <utility>
 
 #include <nlohmann/json.hpp>
 
@@ -19,9 +18,6 @@ conf::skuConfig skusConfig;
 
 void run()
 {
-    std::map<int, std::vector<std::string>> skuConfig;
-    int skuNum;
-
     try
     {
         auto jsonData = parseValidateJson(marginConfigPath);
@@ -30,15 +26,17 @@ void run()
     }
     catch (const std::exception& e)
     {
-        std::cerr << "Failed during building: " << e.what() << "\n";
+        std::cerr << "Failed during building json file: " << e.what() << "\n";
         exit(EXIT_FAILURE);
     }
 
     /** determine sku **/
-    skuNum = getSkuNum();
-    skuConfig = skusConfig[skuNum];
+    auto skuNum = getSkuNum();
 
-    /** start update loop **/
+    /** get sku info **/
+    auto skuConfig = skusConfig[skuNum];
+
+    /** start updating margin temp loop **/
     updateMarginTempLoop(skuConfig, sensorConfig);
 }
 

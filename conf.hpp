@@ -8,6 +8,7 @@ namespace conf
 {
 struct sensorConfig
 {
+    std::string sensorType;
     std::string unit;
     std::string pathType;
     std::string path;

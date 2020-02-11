@@ -18,7 +18,9 @@ int getSkuNum()
 {
     int skuNum = 1;
 
-    /* TBD */
+    /* TO DO:
+     * The method of determining sku is not yet known.
+     */
 
     return skuNum;
 }
@@ -38,11 +40,14 @@ int getSensorDbusTemp(std::string sensorDbusPath)
     return temp;
 }
 
-int getSpecTemp()
+int getSpecTemp(struct conf::sensorConfig config)
 {
     int specTemp = 0;
 
-    /* TBD */
+    if (config.sensorType == "cpu")
+    {
+        continue;
+    }
 
     return specTemp;
 }
@@ -121,7 +126,8 @@ void updateMarginTempLoop(
                 sensorRealTemp = 0;
                 if (sensorList[i][t->first].spec == -1)
                 {
-                    sensorSpecTemp = getSpecTemp();
+                    sensorSpecTemp =
+                        getSpecTemp(sensorList[i][t->first]);
                 }
                 else
                 {
