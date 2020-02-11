@@ -40,11 +40,27 @@ int getSensorDbusTemp(std::string sensorDbusPath)
 
 int getSpecTemp(struct conf::sensorConfig config)
 {
-    int specTemp = 0;
-
-    if (config.sensorType == "cpu")
+    if (config.spec.specTemp != -1)
     {
-        return 105000;
+        return config.spec.specTemp;
+    }
+
+    int specTemp = -1;
+
+    if (config.spec.type == "sys")
+    {
+        std::fstream sensorSpecFile;
+        std::string path;
+
+        path = getSysPath(config.spec.sysPath, config.spec.sysInput, 
+            config.spec.sysChannel, config.spec.sysReg);
+        sensorSpecFile.open(path, std::ios::in);
+        if (sensorSpecFile)
+        {
+            sensorSpecFile >> specTemp;
+        }
+        
+        sensorSpecFile.close();
     }
 
     return specTemp;
@@ -121,19 +137,24 @@ void updateMarginTempLoop(
             for (auto t = sensorList[i].begin(); t != sensorList[i].end(); t++)
             {
                 sensorRealTemp = 0;
-                if (sensorList[i][t->first].spec == -1)
+                if (sensorList[i][t->first].spec.specTemp == -1)
                 {
                     sensorSpecTemp =
                         getSpecTemp(sensorList[i][t->first]);
                 }
                 else
                 {
-                    sensorSpecTemp = sensorList[i][t->first].spec;
+                    sensorSpecTemp = sensorList[i][t->first].spec.specTemp;
                 }
 
                 if (sensorList[i][t->first].pathType.compare("sys") == 0)
                 {
-                    sensorTempFile.open(getSensorPath(t->second), std::ios::in);
+                    std::string path;
+
+                    path = getSysPath(t->second.sysPath,
+                        t->second.sysInput, t->second.sysChannel,
+                        t->second.sysReg);
+                    sensorTempFile.open(path, std::ios::in);
                     if (sensorTempFile)
                     {
                         sensorTempFile >> sensorRealTemp;

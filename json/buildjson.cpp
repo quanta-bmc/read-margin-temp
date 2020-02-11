@@ -12,6 +12,7 @@ namespace conf
 {
 void from_json(const nlohmann::json& jsonData, conf::sensorConfig& configItem)
 {
+    jsonData.at("name").get_to(configItem.name);
     jsonData.at("sensorType").get_to(configItem.sensorType);
     jsonData.at("unit").get_to(configItem.unit);
     jsonData.at("pathType").get_to(configItem.pathType);
@@ -21,7 +22,14 @@ void from_json(const nlohmann::json& jsonData, conf::sensorConfig& configItem)
     jsonData.at("sysChannel").get_to(configItem.sysChannel);
     jsonData.at("sysReg").get_to(configItem.sysReg);
     jsonData.at("offset").get_to(configItem.offset);
-    jsonData.at("spec").get_to(configItem.spec);
+
+    auto spec = jsonData.at("spec");
+    spec.at("type").get_to(configItem.spec.type);
+    spec.at("specTemp").get_to(configItem.spec.specTemp);
+    spec.at("sysPath").get_to(configItem.spec.sysPath);
+    spec.at("sysInput").get_to(configItem.spec.sysInput);
+    spec.at("sysChannel").get_to(configItem.spec.sysChannel);
+    spec.at("sysReg").get_to(configItem.spec.sysReg);
 }
 
 void from_json(

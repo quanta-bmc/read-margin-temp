@@ -6,4 +6,4 @@ std::string getSensorDeviceAddr(std::string partialPath, std::string reg);
 
 std::string getSensorHwmonNum(std::string partialPath);
 
-std::string getSensorPath(struct conf::sensorConfig sensorConfig);
+std::string getSysPath(struct conf::sensorConfig sensorConfig);

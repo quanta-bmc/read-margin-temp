@@ -8,6 +8,7 @@ namespace conf
 {
 struct sensorConfig
 {
+    std::string name;
     std::string sensorType;
     std::string unit;
     std::string pathType;
@@ -17,8 +18,18 @@ struct sensorConfig
     int sysChannel;
     std::string sysReg;
     int offset;
-    int spec;
+    specInfo spec;
 };
+
+struct specInfo
+{
+    std::string type;
+    int specTemp;
+    std::string sysPath;
+    std::string sysInput;
+    int sysChannel;
+    std::string sysReg;
+}
 
 using skuConfig = std::map<int, std::map<int, std::vector<std::string>>>;
 }
