@@ -29,7 +29,7 @@ struct specInfo
     std::string sysInput;
     int sysChannel;
     std::string sysReg;
-}
+};
 
 using skuConfig = std::map<int, std::map<int, std::vector<std::string>>>;
 }
