@@ -66,7 +66,7 @@ int getSpecTemp(struct conf::sensorConfig config)
     }
     else if (config.specType == "file")
     {
-        sensorSpecFile.open(path, std::ios::in);
+        sensorSpecFile.open(config.specPath, std::ios::in);
         if (sensorSpecFile)
         {
             sensorSpecFile >> specTemp;
