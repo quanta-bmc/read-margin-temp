@@ -1,3 +1,4 @@
+#include <fstream>
 #include <dirent.h>
 
 #include "conf.hpp"
@@ -41,7 +42,7 @@ std::string getSensorHwmonNum(std::string partialPath)
     return "";
 }
 
-std::string getSysPath(std::string path,
+std::string getSysPath(std::string path, std::string label,
     std::string input, int channelNum, std::string reg)
 {
     std::string channel = "channel-";
@@ -65,7 +66,43 @@ std::string getSysPath(std::string path,
     }
 
     path += "/";
-    path += input;
+
+    if (label.empty())
+    {
+        path += input;
+    }
+    else
+    {
+        auto dir = opendir(path.c_str());
+
+        while ((drnt = readdir(dir)) != NULL)
+        {
+            std::string addr(drnt->d_name);
+            if (addr.find("label") != std::string::npos)
+            {
+                std::fstream labelFile;
+                std::string labelFilePath = path;
+                std::string labelFileContent;
+
+                labelFilePath.append(addr);
+                labelFile.open(labelFilePath, std::ios::in);
+                if (labelFile)
+                {
+                    labelFile >> labelFileContent;
+                }
+
+                labelFile.close();
+
+                if (labelFileContent == "label")
+                {
+                    addr.replace(addr.end()-5, addr.end(), "input");
+                    path += addr;
+                }
+            }
+        }
+        closedir(dir);
+
+    }
 
     return path;
 }

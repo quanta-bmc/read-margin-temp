@@ -28,5 +28,5 @@ std::string getSensorHwmonNum(std::string partialPath);
  * @param[in] reg - register number.
  * @return Path.
  */
-std::string getSysPath(std::string path,
+std::string getSysPath(std::string path, std::string label,
     std::string input, int channelNum, std::string reg);

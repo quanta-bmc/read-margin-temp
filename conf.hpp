@@ -14,6 +14,7 @@ struct sensorConfig
     std::string pathType;
     std::string dbusPath;
     std::string sysPath;
+    std::string sysLabel;
     std::string sysInput;
     int sysChannel;
     std::string sysReg;
@@ -23,6 +24,7 @@ struct sensorConfig
     std::string specType;
     int specTemp;
     std::string specPath;
+    std::string specSysLabel;
     std::string specSysInput;
     int specSysChannel;
     std::string specSysReg;

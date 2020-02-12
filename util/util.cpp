@@ -54,8 +54,8 @@ int getSpecTemp(struct conf::sensorConfig config)
     {
         std::string path;
 
-        path = getSysPath(config.specPath, config.specSysInput, 
-            config.specSysChannel, config.specSysReg);
+        path = getSysPath(config.specPath, config.specSysLabel,
+            config.specSysInput, config.specSysChannel, config.specSysReg);
         sensorSpecFile.open(path, std::ios::in);
         if (sensorSpecFile)
         {
@@ -159,11 +159,11 @@ void updateMarginTempLoop(
                     sensorSpecTemp = sensorList[i][t->first].specTemp;
                 }
 
-                if (sensorList[i][t->first].pathType.compare("sys") == 0)
+                if (sensorList[i][t->first].pathType == "sys")
                 {
                     std::string path;
 
-                    path = getSysPath(t->second.sysPath,
+                    path = getSysPath(t->second.sysPath, t->second.sysLabel,
                         t->second.sysInput, t->second.sysChannel,
                         t->second.sysReg);
                     sensorTempFile.open(path, std::ios::in);
@@ -178,13 +178,13 @@ void updateMarginTempLoop(
                     
                     sensorTempFile.close();
                 }
-                else if (sensorList[i][t->first].pathType.compare("dbus") == 0)
+                else if (sensorList[i][t->first].pathType == "dbus")
                 {
                     sensorRealTemp = 
                         getSensorDbusTemp(sensorList[i][t->first].dbusPath);
                 }
 
-                if (sensorList[i][t->first].unit.compare("degree") == 0)
+                if (sensorList[i][t->first].unit == "degree")
                 {
                     sensorRealTemp *= 1000;
                     sensorSpecTemp *= 1000;
