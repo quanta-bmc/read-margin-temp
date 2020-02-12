@@ -26,7 +26,7 @@ void from_json(const nlohmann::json& jsonData, conf::sensorConfig& configItem)
     auto spec = jsonData.at("spec");
     spec.at("type").get_to(configItem.specType);
     spec.at("specTemp").get_to(configItem.specTemp);
-    spec.at("sysPath").get_to(configItem.specSysPath);
+    spec.at("path").get_to(configItem.specPath);
     spec.at("sysInput").get_to(configItem.specSysInput);
     spec.at("sysChannel").get_to(configItem.specSysChannel);
     spec.at("sysReg").get_to(configItem.specSysReg);

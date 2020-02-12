@@ -20,6 +20,14 @@ namespace dbus
 class SDBusPlus
 {
 public:
+    /**
+     * Set value to dbus.
+     *
+     * @param[in] bus - bus.
+     * @param[in] busName - bus name.
+     * @param[in] objPath - object path.
+     * @param[in] value - value to be set.
+     */
     static auto
         setValueProperty(sdbusplus::bus::bus& bus, const std::string& busName,
             const std::string& objPath, const int64_t& value)
@@ -44,6 +52,14 @@ public:
         }
     }
 
+    /**
+     * Get value from dbus.
+     *
+     * @param[in] bus - bus.
+     * @param[in] service - dbus service name.
+     * @param[in] path - dbus path.
+     * @return Value from dbus.
+     */
     static int getValueProperty(sdbusplus::bus::bus& bus,
         const std::string& service, const std::string& path)
     {

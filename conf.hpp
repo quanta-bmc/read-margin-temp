@@ -22,7 +22,7 @@ struct sensorConfig
     /** spec info **/
     std::string specType;
     int specTemp;
-    std::string specSysPath;
+    std::string specPath;
     std::string specSysInput;
     int specSysChannel;
     std::string specSysReg;

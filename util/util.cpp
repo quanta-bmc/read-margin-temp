@@ -16,8 +16,10 @@
 
 int getSkuNum()
 {
-    /* TO DO:
-     * The method of determining sku is not yet known.
+    /**
+     * TO DO:
+     * The method of determining sku is not yet known. Now default sku number
+     * is 1.
      */
 
     return 1;
@@ -46,20 +48,30 @@ int getSpecTemp(struct conf::sensorConfig config)
     }
 
     int specTemp = -1;
+    std::fstream sensorSpecFile;
 
     if (config.specType == "sys")
     {
-        std::fstream sensorSpecFile;
         std::string path;
 
-        path = getSysPath(config.specSysPath, config.specSysInput, 
+        path = getSysPath(config.specPath, config.specSysInput, 
             config.specSysChannel, config.specSysReg);
         sensorSpecFile.open(path, std::ios::in);
         if (sensorSpecFile)
         {
             sensorSpecFile >> specTemp;
         }
-        
+
+        sensorSpecFile.close();
+    }
+    else if (config.specType == "file")
+    {
+        sensorSpecFile.open(path, std::ios::in);
+        if (sensorSpecFile)
+        {
+            sensorSpecFile >> specTemp;
+        }
+
         sensorSpecFile.close();
     }
 
