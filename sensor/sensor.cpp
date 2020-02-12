@@ -93,7 +93,7 @@ std::string getSysPath(std::string path, std::string label,
 
                 labelFile.close();
 
-                if (labelFileContent == "label")
+                if (labelFileContent == label)
                 {
                     addr.replace(addr.end()-5, addr.end(), "input");
                     path += addr;
