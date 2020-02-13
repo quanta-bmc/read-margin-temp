@@ -1,0 +1,116 @@
+{
+    "sensors" : [
+        {
+            "name": "Temp_CPU",
+            "sensorType": "cpu",
+            "unit": "millidegree",
+            "pathType": "dbus",
+            "dbusPath": "/xyz/openbmc_project/sensors/temperature/Temp_CPU",
+            "sysPath": "",
+            "sysLabel": "",
+            "sysInput": "",
+            "sysChannel": -1,
+            "sysReg": "",
+            "offset": 0,
+            "spec": {
+                "type": "sys",
+                "specTemp": -1,
+                "path": "/sys/devices/platform/ahb/ahb:apb/f0100000.peci-bus/peci-0/0-30/peci-cputemp.0/hwmon",
+                "sysLabel": "Tjmax",
+                "sysInput": "",
+                "sysChannel": -1,
+                "sysReg": ""
+            }
+        },
+        {
+            "name": "Temp_Sensor_1",
+            "sensorType": "dimm",
+            "unit": "millidegree",
+            "pathType": "dbus",
+            "dbusPath": "/xyz/openbmc_project/sensors/temperature/Temp_Sensor_1",
+            "sysPath": "",
+            "sysLabel": "",
+            "sysInput": "",
+            "sysChannel": -1,
+            "sysReg": "",
+            "offset": 0,
+            "spec": {
+                "type": "",
+                "specTemp": 80000,
+                "path": "",
+                "sysLabel": "",
+                "sysInput": "",
+                "sysChannel": -1,
+                "sysReg": ""
+            }
+        },
+        {
+            "name": "Temp_DIMM31_CPU1",
+            "sensorType": "dimm",
+            "unit": "millidegree",
+            "pathType": "dbus",
+            "dbusPath": "/xyz/openbmc_project/sensors/temperature/Temp_DIMM31_CPU1",
+            "sysPath": "",
+            "sysLabel": "",
+            "sysInput": "",
+            "sysChannel": -1,
+            "sysReg": "",
+            "offset": 0,
+            "spec": {
+                "type": "",
+                "specTemp": 85000,
+                "path": "",
+                "sysLabel": "",
+                "sysInput": "",
+                "sysChannel": -1,
+                "sysReg": ""
+            }
+        },
+        {
+            "name": "PCIE_0",
+            "sensorType": "pcie",
+            "unit": "millidegree",
+            "pathType": "dbus",
+            "dbusPath": "/xyz/openbmc_project/sensors/temperature/PCIE_0",
+            "sysPath": "",
+            "sysLabel": "",
+            "sysInput": "",
+            "sysChannel": -1,
+            "sysReg": "",
+            "offset": 0,
+            "spec": {
+                "type": "",
+                "specTemp": 0,
+                "path": "",
+                "sysLabel": "",
+                "sysInput": "",
+                "sysChannel": -1,
+                "sysReg": ""
+            }
+        }
+    ],
+    "skus" : [
+        {
+            "num": 1,
+            "zones": [
+                {
+                    "id": 0,
+                    "components": ["Temp_CPU", "Temp_Sensor_1"]
+                }
+            ]
+        },
+        {
+            "num": 2,
+            "zones": [
+                {
+                    "id": 0,
+                    "components": ["Temp_CPU0", "Temp_DIMM0_CPU0", "Temp_DIMM1_CPU0", "Temp_DIMM2_CPU0", "Temp_DIMM3_CPU0","Temp_DIMM4_CPU0", "Temp_DIMM5_CPU0", "Temp_DIMM6_CPU0", "Temp_DIMM7_CPU0", "Temp_DIMM8_CPU0", "Temp_DIMM9_CPU0", "Temp_DIMM10_CPU0", "Temp_DIMM11_CPU0", "Temp_DIMM12_CPU0", "Temp_DIMM13_CPU0", "Temp_DIMM14_CPU0", "Temp_DIMM15_CPU0", "PCIE_0", "PCIE_1", "PCIE_2", "PCIE_3"]
+                },
+                {
+                    "id": 1,
+                    "components": ["Temp_CPU1", "Temp_DIMM16_CPU1", "Temp_DIMM17_CPU1", "Temp_DIMM18_CPU1", "Temp_DIMM19_CPU1", "Temp_DIMM20_CPU1", "Temp_DIMM21_CPU1", "Temp_DIMM22_CPU1", "Temp_DIMM23_CPU1", "Temp_DIMM24_CPU1", "Temp_DIMM25_CPU1", "Temp_DIMM26_CPU1", "Temp_DIMM27_CPU1", "Temp_DIMM28_CPU1", "Temp_DIMM29_CPU1", "Temp_DIMM30_CPU1", "Temp_DIMM31_CPU1", "PCIE_4", "PCIE_5", "PCIE_6", "PCIE_7"]
+                }
+            ]
+        }
+    ]
+}
