@@ -13,7 +13,6 @@ namespace conf
 void from_json(const nlohmann::json& jsonData, conf::sensorConfig& configItem)
 {
     jsonData.at("name").get_to(configItem.name);
-    jsonData.at("sensorType").get_to(configItem.sensorType);
     jsonData.at("unit").get_to(configItem.unit);
     jsonData.at("pathType").get_to(configItem.pathType);
     jsonData.at("dbusPath").get_to(configItem.dbusPath);

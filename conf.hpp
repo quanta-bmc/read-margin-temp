@@ -9,7 +9,6 @@ namespace conf
 struct sensorConfig
 {
     std::string name;
-    std::string sensorType;
     std::string unit;
     std::string pathType;
     std::string dbusPath;
