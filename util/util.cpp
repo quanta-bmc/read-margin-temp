@@ -145,7 +145,7 @@ void updateMarginTempLoop(
     {
         for (int i = 0; i < numOfZones; i++)
         {
-            calibMarginTemp = 0;
+            calibMarginTemp = -1;
             for (auto t = sensorList[i].begin(); t != sensorList[i].end(); t++)
             {
                 sensorRealTemp = 0;
@@ -196,7 +196,7 @@ void updateMarginTempLoop(
                     sensorCalibTemp = sensorMarginTemp;
                     sensorCalibTemp += sensorList[i][t->first].offset;
 
-                    if (calibMarginTemp == 0 ||
+                    if (calibMarginTemp == -1 ||
                         sensorMarginTemp < calibMarginTemp)
                     {
                         calibMarginTemp = sensorCalibTemp;
