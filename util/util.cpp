@@ -197,7 +197,7 @@ void updateMarginTempLoop(
                     sensorCalibTemp += sensorList[i][t->first].offset;
 
                     if (calibMarginTemp == -1 ||
-                        sensorMarginTemp < calibMarginTemp)
+                        sensorCalibTemp < calibMarginTemp)
                     {
                         calibMarginTemp = sensorCalibTemp;
                     }
