@@ -10,7 +10,7 @@ std::string getSensorDeviceAddr(std::string partialPath, std::string reg)
 {
     auto dir = opendir(partialPath.c_str());
 
-    while ((drnt = readdir(dir)) != NULL)
+    while ((dir != NULL) && ((drnt = readdir(dir)) != NULL))
     {
         std::string addr(drnt->d_name);
         if (addr.find(reg.c_str()) != std::string::npos)
@@ -28,7 +28,7 @@ std::string getSensorHwmonNum(std::string partialPath)
 {
     auto dir = opendir(partialPath.c_str());
 
-    while ((drnt = readdir(dir)) != NULL) 
+    while ((dir != NULL) && ((drnt = readdir(dir)) != NULL)) 
     {
         std::string hwmonNum(drnt->d_name);
         if (hwmonNum.find("hwmon") != std::string::npos)
@@ -75,7 +75,7 @@ std::string getSysPath(std::string path, std::string label,
     {
         auto dir = opendir(path.c_str());
 
-        while ((drnt = readdir(dir)) != NULL)
+        while ((dir != NULL) && ((drnt = readdir(dir)) != NULL))
         {
             std::string addr(drnt->d_name);
             if (addr.find("label") != std::string::npos)
