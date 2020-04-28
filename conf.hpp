@@ -18,6 +18,7 @@ struct sensorConfig
     int sysChannel;
     std::string sysReg;
     int offset;
+    double scalar;
 
     /** spec info **/
     std::string specType;
@@ -29,5 +30,5 @@ struct sensorConfig
     std::string specSysReg;
 };
 
-using skuConfig = std::map<int, std::map<int, std::vector<std::string>>>;
+using skuConfig = std::map<int, std::map<int, std::pair<std::string, std::vector<std::string>>>>;
 }

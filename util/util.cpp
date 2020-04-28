@@ -109,19 +109,16 @@ std::string getService(const std::string path)
     return response.begin()->first;
 }
 
-void updateDbusMarginTemp(int zoneNum, int64_t marginTemp)
+void updateDbusMarginTemp(int zoneNum, int64_t marginTemp, std::string targetpath)
 {
     auto bus = sdbusplus::bus::new_default();
     std::string service = "xyz.openbmc_project.Hwmon.external";
-    std::string path = "/xyz/openbmc_project/extsensors/margin/fleeting";
 
-    path += std::to_string(zoneNum);
-
-    dbus::SDBusPlus::setValueProperty(bus, service, path, marginTemp);
+    dbus::SDBusPlus::setValueProperty(bus, service, targetpath, marginTemp);
 }
 
 void updateMarginTempLoop(
-    std::map<int, std::vector<std::string>> skuConfig,
+    std::map<int, std::pair<std::string, std::vector<std::string>>> skuConfig,
     std::map<std::string, struct conf::sensorConfig> sensorConfig)
 {
     std::fstream sensorTempFile;
@@ -135,7 +132,7 @@ void updateMarginTempLoop(
 
     for (int i = 0; i < numOfZones; i++)
     {
-        for (auto t = skuConfig[i].begin(); t != skuConfig[i].end(); t++)
+        for (auto t = skuConfig[i].second.begin(); t != skuConfig[i].second.end(); t++)
         {
             sensorList[i][*t] = sensorConfig[*t];
         }
@@ -173,7 +170,8 @@ void updateMarginTempLoop(
                     }
                     else
                     {
-                        break;
+                        sensorTempFile.close();
+                        continue;
                     }
                     
                     sensorTempFile.close();
@@ -189,12 +187,21 @@ void updateMarginTempLoop(
                     sensorRealTemp *= 1000;
                     sensorSpecTemp *= 1000;
                 }
+                else if (sensorList[i][t->first].unit == "millimargin"){
+                    if (calibMarginTemp == -1 ||
+                        sensorRealTemp < calibMarginTemp)
+                    {
+                        calibMarginTemp = sensorRealTemp;
+                    }
+                    continue;
+                }
 
                 if (sensorRealTemp != -1)
                 {
                     sensorMarginTemp = (sensorSpecTemp - sensorRealTemp);
                     sensorCalibTemp = sensorMarginTemp;
                     sensorCalibTemp += sensorList[i][t->first].offset;
+                    sensorCalibTemp *= sensorList[i][t->first].scalar;
 
                     if (calibMarginTemp == -1 ||
                         sensorCalibTemp < calibMarginTemp)
@@ -204,7 +211,7 @@ void updateMarginTempLoop(
                 }
             }
 
-            updateDbusMarginTemp(i, calibMarginTemp);
+            updateDbusMarginTemp(i, calibMarginTemp, skuConfig[i].first);
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
     }

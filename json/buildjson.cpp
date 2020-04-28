@@ -22,6 +22,7 @@ void from_json(const nlohmann::json& jsonData, conf::sensorConfig& configItem)
     jsonData.at("sysChannel").get_to(configItem.sysChannel);
     jsonData.at("sysReg").get_to(configItem.sysReg);
     jsonData.at("offset").get_to(configItem.offset);
+    jsonData.at("scalar").get_to(configItem.scalar);
 
     auto spec = jsonData.at("spec");
     spec.at("type").get_to(configItem.specType);
@@ -61,19 +62,21 @@ conf::skuConfig getSkuInfo(const nlohmann::json& data)
 
     for (const auto& sku : skus)
     {
-        std::map<int, std::vector<std::string>> skuZonesInfo;
+        std::map<int, std::pair<std::string, std::vector<std::string>>> skuZonesInfo;
         auto num = sku["num"];
         auto zones = sku["zones"];
 
         for (const auto& zone : zones)
         {
             auto id = zone["id"];
+            auto target = zone["target"];
             auto components =
                 zone["components"].get<std::vector<std::string>>();
 
+            skuZonesInfo[id].first = target;
             for (const auto& i : components)
             {
-                skuZonesInfo[id].push_back(i);
+                skuZonesInfo[id].second.push_back(i);
             }
         }
         skusConfig[num] = skuZonesInfo;
