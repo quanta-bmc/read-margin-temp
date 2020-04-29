@@ -43,7 +43,7 @@ std::string getService(const std::string dbusPath);
  * @param[in] zoneNum - zone number.
  * @param[in] marginTemp - margin temp.
  */
-void updateDbusMarginTemp(int zoneNum, int64_t marginTemp);
+void updateDbusMarginTemp(int zoneNum, int64_t marginTemp, std::string targetpath);
 
 /**
  * Calculate and update margin temp every second.
