@@ -3,85 +3,61 @@
         {
             "name": "cpu0",
             "unit": "millidegree",
-            "pathType": "dbus",
-            "dbusPath": "/xyz/openbmc_project/sensors/temperature/cpu0",
-            "sysPath": "",
-            "sysLabel": "",
-            "sysInput": "",
-            "sysChannel": -1,
-            "sysReg": "",
-            "offset": 0,
-            "spec": {
+            "type": "dbus",
+            "path": "/xyz/openbmc_project/sensors/temperature/cpu0",
+            "parameters": {
                 "type": "sys",
-                "specTemp": -1,
-                "path": "/sys/devices/platform/ahb/ahb:apb/f0100000.peci-bus/peci-0/0-30/peci-cputemp.0/hwmon",
+                "maxTemp": -1,
+                "path": "/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@100000/f0100000.peci-bus/peci-0/0-30/peci-cputemp.0/hwmon",
                 "sysLabel": "Tjmax",
-                "sysInput": "",
-                "sysChannel": -1,
-                "sysReg": ""
+                "targetTemp": -1,
+                "targetTempOffset": -10000,
+                "scalar": 1.0
             }
         },
         {
             "name": "dimm0",
             "unit": "millidegree",
-            "pathType": "dbus",
-            "dbusPath": "/xyz/openbmc_project/sensors/temperature/dimm0",
-            "sysPath": "",
-            "sysLabel": "",
-            "sysInput": "",
-            "sysChannel": -1,
-            "sysReg": "",
-            "offset": 0,
-            "spec": {
+            "type": "dbus",
+            "path": "/xyz/openbmc_project/sensors/temperature/dimm0",
+            "parameters": {
                 "type": "",
-                "specTemp": 80000,
+                "maxTemp": 85000,
                 "path": "",
                 "sysLabel": "",
-                "sysInput": "",
-                "sysChannel": -1,
-                "sysReg": ""
+                "targetTemp": 75000,
+                "targetTempOffset": 0,
+                "scalar": 1.0
             }
         },
         {
             "name": "cpu1",
             "unit": "millidegree",
-            "pathType": "dbus",
-            "dbusPath": "/xyz/openbmc_project/sensors/temperature/cpu1",
-            "sysPath": "",
-            "sysLabel": "",
-            "sysInput": "",
-            "sysChannel": -1,
-            "sysReg": "",
-            "offset": 0,
-            "spec": {
-                "type": "",
-                "specTemp": 85000,
-                "path": "",
-                "sysLabel": "",
-                "sysInput": "",
-                "sysChannel": -1,
-                "sysReg": ""
+            "type": "dbus",
+            "path": "/xyz/openbmc_project/sensors/temperature/cpu1",
+            "parameters": {
+                "type": "sys",
+                "maxTemp": -1,
+                "path": "/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@100000/f0100000.peci-bus/peci-0/0-31/peci-cputemp.1/hwmon",
+                "sysLabel": "Tjmax",
+                "targetTemp": -1,
+                "targetTempOffset": -10000,
+                "scalar": 1.0
             }
         },
         {
             "name": "dimm1",
             "unit": "millidegree",
-            "pathType": "dbus",
-            "dbusPath": "/xyz/openbmc_project/sensors/temperature/dimm1",
-            "sysPath": "",
-            "sysLabel": "",
-            "sysInput": "",
-            "sysChannel": -1,
-            "sysReg": "",
-            "offset": 0,
-            "spec": {
+            "type": "dbus",
+            "path": "/xyz/openbmc_project/sensors/temperature/dimm1",
+            "parameters": {
                 "type": "",
-                "specTemp": 0,
+                "maxTemp": 85000,
                 "path": "",
                 "sysLabel": "",
-                "sysInput": "",
-                "sysChannel": -1,
-                "sysReg": ""
+                "targetTemp": 75000,
+                "targetTempOffset": 0,
+                "scalar": 1.0
             }
         }
     ],
@@ -91,19 +67,14 @@
             "zones": [
                 {
                     "id": 0,
-                    "components": ["cpu0", "dimm0"]
-                }
-            ]
-        },
-        {
-            "num": 2,
-            "zones": [
-                {
-                    "id": 0,
+                    "zoneSetpoint": 10000,
+                    "target": "/xyz/openbmc_project/extsensors/margin/real_fleeting0",
                     "components": ["cpu0", "dimm0"]
                 },
                 {
                     "id": 1,
+                    "zoneSetpoint": 10000,
+                    "target": "/xyz/openbmc_project/extsensors/margin/real_fleeting1",
                     "components": ["cpu1", "dimm1"]
                 }
             ]

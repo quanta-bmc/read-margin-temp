@@ -14,49 +14,45 @@ sku configurations. The detailed introduction is listed below.
 
 # Sensor Configuration
 
-"sensors" : [
-    {
-        "name": "cpu0",         /* name of the sensor */
-        "unit": "millidegree",  /* temperature unit: millidegree, degree */
-        "pathType": "dbus",     /* temperature reading path type: dbus, sys */
-        "dbusPath": "/xyz/openbmc_project/sensors/temperature/cpu0",
-                                /* temperature reading dbus path */
-        "sysPath": "",          /* temperature reading /sys/devices path */
-        "sysLabel": "",         /* for Tjmax-like reading */
-        "sysInput": "",         /* for temp1_input-like reading */
-        "sysChannel": -1,       /* sys path channel number, -1: no channel */
-        "sysReg": "",           /* sys path register */
-        "offset": 0,            /* offset value */
-        "spec": {
-            "type": "sys",      /* spec temperature reading type: sys, file */
-            "specTemp": -1,     /* fixed spec temperature, -1 for not fixed */
-            "path": "/sys/devices/platform/ahb/ahb:apb/f0100000.peci-bus/peci-0/0-30/peci-cputemp.0/hwmon",
-                                /* spec temperature reading /sys/devices path */
-            "sysLabel": "Tjmax",
-                                /* for Tjmax, label-like spec reading */
-            "sysInput": "",     /* for temp1_input like spec reading */
-            "sysChannel": -1,   /* sys path channel number, -1 means no channel */
-            "sysReg": ""        /* sys path register */
-        }
-    }
-]
+* "sensors" : [
+    * {
+        * "name": "cpu0",           /* name of the sensor */
+        * "unit": "millidegree",    /* temperature unit: millidegree, degree, millimargin */
+        * "type": "dbus",           /* temperature reading path type: dbus, sys */
+        * "path": "/xyz/openbmc_project/sensors/temperature/cpu0",   /* temperature reading dbus or sys path */
+        * "parameters": {
+            * "type": "sys",        /* spec temperature reading type: sys, file */
+            * "specTemp": -1,       /* fixed spec temperature, -1 for not fixed, unit: millidegree */
+            * "path": "/sys/devices/platform/ahb/ahb:apb/f0100000.peci-bus/peci-0/0-30/peci-cputemp.0/hwmon",
+                                    /* spec temperature reading /sys/devices path */
+            * "sysLabel": "Tjmax",  /* for Tjmax, label-like spec reading */
+            * "targetTemp": -1,     /* target temperature, unit: millidegree */
+            * "targetTempOffset": -10000,   /* target temperature's offset, unit: millidegree */
+            * "scalar": 1.0         /* scalar value */
+        * }
+    * }
+* ]
 
 # Sku Configuration
 
-"skus" : [
-    {
-        "num": 1,           /* sku number */
-        "zones": [
-            {
-                "id": 0,    /* zone id */
-                "components": ["cpu0", "dimm1"]
+* "skus" : [
+    * {
+        * "num": 1,           /* sku number */
+        * "zones": [
+            * {
+                * "id": 0,    /* zone id */
+                * "zoneSetpoint": 10000,  /* zone setpoint, unit: millimargin */
+                * "target": "/xyz/openbmc_project/extsensors/margin/real_fleeting0", /* target dbus path */
+                * "components": ["cpu0", "dimm1"]
                             /* sensor names list */
-            },
-            {
-                "id": 1,    /* zone id */
-                "components": ["cpu1", "dimm2"]
+            * },
+            * {
+                * "id": 1,    /* zone id */
+                * "zoneSetpoint": 10000,  /* zone setpoint, unit: millimargin */
+                * "target": "/xyz/openbmc_project/extsensors/margin/real_fleeting1", /* target dbus path */
+                * "components": ["cpu1", "dimm2"]
                             /* sensor names list */
-            }
-        ]
-    }
-]
+            * }
+        * ]
+    * }
+* ]
