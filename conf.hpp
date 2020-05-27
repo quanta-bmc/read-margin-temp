@@ -10,25 +10,18 @@ struct sensorConfig
 {
     std::string name;
     std::string unit;
-    std::string pathType;
-    std::string dbusPath;
-    std::string sysPath;
-    std::string sysLabel;
-    std::string sysInput;
-    int sysChannel;
-    std::string sysReg;
-    int offset;
-    double scalar;
+    std::string type;
+    std::string path;
 
-    /** spec info **/
-    std::string specType;
-    int specTemp;
-    std::string specPath;
-    std::string specSysLabel;
-    std::string specSysInput;
-    int specSysChannel;
-    std::string specSysReg;
+    /** parameters info **/
+    std::string parametersType;
+    int parametersMaxTemp;
+    std::string parametersPath;
+    std::string parametersSysLabel;
+    int parametersTargetTemp;
+    int parametersTargetTempOffset;
+    double parametersScalar;
 };
 
-using skuConfig = std::map<int, std::map<int, std::pair<std::string, std::vector<std::string>>>>;
+using skuConfig = std::map<int, std::map<int, std::pair<std::pair<int, std::string>, std::vector<std::string>>>>;
 }

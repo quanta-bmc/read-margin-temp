@@ -3,15 +3,6 @@
 #include <string>
 
 /**
- * Get device address.
- *
- * @param[in] partialPath - partial path.
- * @param[in] reg - register name.
- * @return Sku config.
- */
-std::string getSensorDeviceAddr(std::string partialPath, std::string reg);
-
-/**
  * Get hwmon number.
  *
  * @param[in] partialPath - partial path.
@@ -28,5 +19,4 @@ std::string getSensorHwmonNum(std::string partialPath);
  * @param[in] reg - register number.
  * @return Path.
  */
-std::string getSysPath(std::string path, std::string label,
-    std::string input, int channelNum, std::string reg);
+std::string getSysPath(std::string path, std::string label = "");

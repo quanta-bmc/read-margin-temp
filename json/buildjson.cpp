@@ -14,28 +14,20 @@ void from_json(const nlohmann::json& jsonData, conf::sensorConfig& configItem)
 {
     jsonData.at("name").get_to(configItem.name);
     jsonData.at("unit").get_to(configItem.unit);
-    jsonData.at("pathType").get_to(configItem.pathType);
-    jsonData.at("dbusPath").get_to(configItem.dbusPath);
-    jsonData.at("sysPath").get_to(configItem.sysPath);
-    jsonData.at("sysLabel").get_to(configItem.sysLabel);
-    jsonData.at("sysInput").get_to(configItem.sysInput);
-    jsonData.at("sysChannel").get_to(configItem.sysChannel);
-    jsonData.at("sysReg").get_to(configItem.sysReg);
-    jsonData.at("offset").get_to(configItem.offset);
-    jsonData.at("scalar").get_to(configItem.scalar);
+    jsonData.at("type").get_to(configItem.type);
+    jsonData.at("path").get_to(configItem.path);
 
-    auto spec = jsonData.at("spec");
-    spec.at("type").get_to(configItem.specType);
-    spec.at("specTemp").get_to(configItem.specTemp);
-    spec.at("path").get_to(configItem.specPath);
-    spec.at("sysLabel").get_to(configItem.specSysLabel);
-    spec.at("sysInput").get_to(configItem.specSysInput);
-    spec.at("sysChannel").get_to(configItem.specSysChannel);
-    spec.at("sysReg").get_to(configItem.specSysReg);
+    auto parameters = jsonData.at("parameters");
+    parameters.at("type").get_to(configItem.parametersType);
+    parameters.at("maxTemp").get_to(configItem.parametersMaxTemp);
+    parameters.at("path").get_to(configItem.parametersPath);
+    parameters.at("sysLabel").get_to(configItem.parametersSysLabel);
+    parameters.at("targetTemp").get_to(configItem.parametersTargetTemp);
+    parameters.at("targetTempOffset").get_to(configItem.parametersTargetTempOffset);
+    parameters.at("scalar").get_to(configItem.parametersScalar);
 }
 
-void from_json(
-    const nlohmann::json& jsonData, std::vector<std::string>& components)
+void from_json(const nlohmann::json& jsonData, std::vector<std::string>& components)
 {
     jsonData.at("components").get_to(components);
 }
@@ -62,7 +54,7 @@ conf::skuConfig getSkuInfo(const nlohmann::json& data)
 
     for (const auto& sku : skus)
     {
-        std::map<int, std::pair<std::string, std::vector<std::string>>> skuZonesInfo;
+        std::map<int, std::pair<std::pair<int, std::string>, std::vector<std::string>>> skuZonesInfo;
         auto num = sku["num"];
         auto zones = sku["zones"];
 
@@ -70,10 +62,12 @@ conf::skuConfig getSkuInfo(const nlohmann::json& data)
         {
             auto id = zone["id"];
             auto target = zone["target"];
+            auto zoneSetpoint = zone["zoneSetpoint"];
             auto components =
                 zone["components"].get<std::vector<std::string>>();
 
-            skuZonesInfo[id].first = target;
+            skuZonesInfo[id].first.first = zoneSetpoint;
+            skuZonesInfo[id].first.second = target;
             for (const auto& i : components)
             {
                 skuZonesInfo[id].second.push_back(i);

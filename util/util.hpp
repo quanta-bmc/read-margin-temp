@@ -30,6 +30,18 @@ int getSensorDbusTemp(std::string sensorDbusPath);
 int getSpecTemp(struct conf::sensorConfig config);
 
 /**
+ * Calculate margin offset value.
+ *
+ * @param[in] setPoint - zone setpoint.
+ * @param[in] scalar - sensor scalar.
+ * @param[in] maxTemp - sensor max temp.
+ * @param[in] targetTemp - sensor target temp.
+ * @param[in] targetOffset - sensor target temp offset.
+ * @return Margin offset.
+ */
+int calOffsetValue(int setPoint, double scalar, int maxTemp, int targetTemp, int targetOffset = 0);
+
+/**
  * Get dbus service name.
  *
  * @param[in] dbusPath - sensor dbus path.
@@ -52,5 +64,5 @@ void updateDbusMarginTemp(int zoneNum, int64_t marginTemp, std::string targetpat
  * @param[in] sensorConfig - sensor config.
  */
 void updateMarginTempLoop(
-    std::map<int, std::pair<std::string, std::vector<std::string>>> skuConfig,
+    std::map<int, std::pair<std::pair<int, std::string>, std::vector<std::string>>> skuConfig,
     std::map<std::string, struct conf::sensorConfig> sensorConfig);
