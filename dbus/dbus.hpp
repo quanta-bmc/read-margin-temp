@@ -32,7 +32,7 @@ public:
         setValueProperty(sdbusplus::bus::bus& bus, const std::string& busName,
             const std::string& objPath, const int64_t& value)
     {
-        sdbusplus::message::variant<int64_t> data = value;
+        std::variant<int64_t> data = value;
 
         try
         {
