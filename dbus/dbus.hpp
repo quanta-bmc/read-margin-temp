@@ -32,7 +32,7 @@ public:
         setValueProperty(sdbusplus::bus::bus& bus, const std::string& busName,
             const std::string& objPath, const int64_t& value)
     {
-        std::variant<int64_t> data = value;
+        std::variant<double> data = (double)value / 1000;
 
         try
         {
@@ -60,7 +60,7 @@ public:
      * @param[in] path - dbus path.
      * @return Value from dbus.
      */
-    static int getValueProperty(sdbusplus::bus::bus& bus,
+    static double getValueProperty(sdbusplus::bus::bus& bus,
         const std::string& service, const std::string& path)
     {
         propertyMap propMap;
@@ -79,7 +79,7 @@ public:
             return -1;
         }
 
-        return std::get<int64_t>(propMap["Value"]);
+        return std::get<double>(propMap["Value"]);
     }
 };
 }

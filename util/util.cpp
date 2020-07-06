@@ -37,7 +37,7 @@ int getSensorDbusTemp(std::string sensorDbusPath)
 
     auto temp = dbus::SDBusPlus::getValueProperty(bus, service, sensorDbusPath);
 
-    return temp;
+    return (int)(temp * 1000);
 }
 
 int getSpecTemp(struct conf::sensorConfig config)
