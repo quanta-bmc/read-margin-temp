@@ -8,7 +8,6 @@
 #include "json/buildjson.hpp"
 #include "sensor/sensor.hpp"
 #include "util/util.hpp"
-#include "dbus/dbus.hpp"
 
 constexpr auto marginConfigPath =
     "/usr/share/read-margin-temp/config-margin.json";

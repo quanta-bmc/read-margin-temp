@@ -14,6 +14,10 @@
 #include "sensor/sensor.hpp"
 #include "dbus/dbus.hpp"
 
+auto bus = sdbusplus::bus::new_default();
+auto sys_bus = sdbusplus::bus::new_system();
+std::map<std::string, std::vector<std::string>> response;
+
 int getSkuNum()
 {
     /**
@@ -27,8 +31,9 @@ int getSkuNum()
 
 int getSensorDbusTemp(std::string sensorDbusPath)
 {
-    auto bus = sdbusplus::bus::new_default();
     std::string service = getService(sensorDbusPath);
+
+    response.clear();
 
     if (service.empty())
     {
@@ -91,20 +96,17 @@ int calOffsetValue(int setPoint, double scalar, int maxTemp, int targetTemp, int
 
 std::string getService(const std::string path)
 {
-    auto bus = sdbusplus::bus::new_system();
     auto mapper =
-        bus.new_method_call("xyz.openbmc_project.ObjectMapper",
+        sys_bus.new_method_call("xyz.openbmc_project.ObjectMapper",
                             "/xyz/openbmc_project/object_mapper",
                             "xyz.openbmc_project.ObjectMapper", "GetObject");
 
     mapper.append(path);
     mapper.append(std::vector<std::string>({"xyz.openbmc_project.Sensor.Value"}));
 
-    std::map<std::string, std::vector<std::string>> response;
-
     try
     {
-        auto responseMsg = bus.call(mapper);
+        auto responseMsg = sys_bus.call(mapper);
         responseMsg.read(response);
     }
     catch (const sdbusplus::exception::SdBusError& ex)
@@ -122,7 +124,6 @@ std::string getService(const std::string path)
 
 void updateDbusMarginTemp(int zoneNum, int64_t marginTemp, std::string targetpath)
 {
-    auto bus = sdbusplus::bus::new_default();
     std::string service = "xyz.openbmc_project.Hwmon.external";
 
     dbus::SDBusPlus::setValueProperty(bus, service, targetpath, marginTemp);
@@ -237,7 +238,7 @@ void updateMarginTempLoop(
             }
 
             updateDbusMarginTemp(i, calibMarginTemp, skuConfig[i].first.second);
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 }
