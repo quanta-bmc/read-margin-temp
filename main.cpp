@@ -16,17 +16,17 @@ constexpr auto marginConfigPath =
 std::map<std::string, struct conf::sensorConfig> sensorConfig = {};
 conf::skuConfig skusConfig;
 
-void run()
+void run(const std::string& configPath)
 {
     try
     {
-        auto jsonData = parseValidateJson(marginConfigPath);
+        auto jsonData = parseValidateJson(configPath);
         sensorConfig = getSensorInfo(jsonData);
         skusConfig = getSkuInfo(jsonData);
     }
     catch (const std::exception& e)
     {
-        std::cerr << "Failed during building json file: " << e.what() << "\n";
+        std::cerr << "Failed during building json file: " << e.what() << std::endl;
         exit(EXIT_FAILURE);
     }
 
@@ -40,9 +40,16 @@ void run()
     updateMarginTempLoop(skuConfig, sensorConfig);
 }
 
-int main()
+int main(int argc, char **argv)
 {
-    run();
+    std::string configPath = marginConfigPath;
+
+    if (argc > 1)
+    {
+        configPath = argv[1];
+    }
+
+    run(configPath);
 
     return 0;
 }

@@ -30,3 +30,11 @@
 *.exe
 *.out
 *.app
+
+# IDEs
+.idea/
+CMakeLists.txt
+cmake-build-debug/
+
+# Temporaries
+singletask.lock
