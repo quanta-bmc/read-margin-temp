@@ -23,5 +23,13 @@ struct sensorConfig
     double parametersScalar;
 };
 
-using skuConfig = std::map<int, std::map<int, std::pair<std::pair<int, std::string>, std::vector<std::string>>>>;
+struct zoneConfig
+{
+    int id;
+    int setpoint;
+    std::string targetPath;
+    std::vector<std::string> components;
+};
+
+using skuConfig = std::map<int, conf::zoneConfig>;
 }

@@ -64,5 +64,5 @@ void updateDbusMarginTemp(int zoneNum, int64_t marginTemp, std::string targetpat
  * @param[in] sensorConfig - sensor config.
  */
 void updateMarginTempLoop(
-    std::map<int, std::pair<std::pair<int, std::string>, std::vector<std::string>>> skuConfig,
+    conf::skuConfig skuConfig,
     std::map<std::string, struct conf::sensorConfig> sensorConfig);

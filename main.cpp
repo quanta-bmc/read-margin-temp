@@ -14,7 +14,7 @@ constexpr auto marginConfigPath =
     "/usr/share/read-margin-temp/config-margin.json";
 
 std::map<std::string, struct conf::sensorConfig> sensorConfig = {};
-conf::skuConfig skusConfig;
+std::map<int, conf::skuConfig> skusConfig;
 
 void run()
 {
