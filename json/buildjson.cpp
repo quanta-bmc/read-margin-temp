@@ -27,9 +27,12 @@ void from_json(const nlohmann::json& jsonData, conf::sensorConfig& configItem)
     parameters.at("scalar").get_to(configItem.parametersScalar);
 }
 
-void from_json(const nlohmann::json& jsonData, std::vector<std::string>& components)
+void from_json(const nlohmann::json& jsonData, conf::zoneConfig& configItem)
 {
-    jsonData.at("components").get_to(components);
+    jsonData.at("id").get_to(configItem.id);
+    jsonData.at("zoneSetpoint").get_to(configItem.setpoint);
+    jsonData.at("target").get_to(configItem.targetPath);
+    jsonData.at("components").get_to(configItem.components);
 }
 }
 
@@ -47,31 +50,21 @@ std::map<std::string, struct conf::sensorConfig>
     return config;
 }
 
-conf::skuConfig getSkuInfo(const nlohmann::json& data)
+std::map<int, conf::skuConfig>
+    getSkuInfo(const nlohmann::json& data)
 {
-    conf::skuConfig skusConfig;
+    std::map<int, conf::skuConfig> skusConfig;
     auto skus = data["skus"];
 
     for (const auto& sku : skus)
     {
-        std::map<int, std::pair<std::pair<int, std::string>, std::vector<std::string>>> skuZonesInfo;
+        conf::skuConfig skuZonesInfo;
         auto num = sku["num"];
         auto zones = sku["zones"];
 
         for (const auto& zone : zones)
         {
-            auto id = zone["id"];
-            auto target = zone["target"];
-            auto zoneSetpoint = zone["zoneSetpoint"];
-            auto components =
-                zone["components"].get<std::vector<std::string>>();
-
-            skuZonesInfo[id].first.first = zoneSetpoint;
-            skuZonesInfo[id].first.second = target;
-            for (const auto& i : components)
-            {
-                skuZonesInfo[id].second.push_back(i);
-            }
+            skuZonesInfo[zone["id"]] = zone.get<struct conf::zoneConfig>();
         }
         skusConfig[num] = skuZonesInfo;
     }

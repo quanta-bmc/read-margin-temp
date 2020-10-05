@@ -129,7 +129,7 @@ void updateDbusMarginTemp(int zoneNum, int64_t marginTemp, std::string targetpat
 }
 
 void updateMarginTempLoop(
-    std::map<int, std::pair<std::pair<int, std::string>, std::vector<std::string>>> skuConfig,
+    conf::skuConfig skuConfig,
     std::map<std::string, struct conf::sensorConfig> sensorConfig)
 {
     std::fstream sensorTempFile;
@@ -143,7 +143,7 @@ void updateMarginTempLoop(
 
     for (int i = 0; i < numOfZones; i++)
     {
-        for (auto t = skuConfig[i].second.begin(); t != skuConfig[i].second.end(); t++)
+        for (auto t = skuConfig[i].components.begin(); t != skuConfig[i].components.end(); t++)
         {
             sensorList[i][*t] = sensorConfig[*t];
         }
@@ -182,12 +182,12 @@ void updateMarginTempLoop(
                         sensorTempFile.close();
                         continue;
                     }
-                    
+
                     sensorTempFile.close();
                 }
                 else if (sensorList[i][t->first].type == "dbus")
                 {
-                    sensorRealTemp = 
+                    sensorRealTemp =
                         getSensorDbusTemp(sensorList[i][t->first].path);
                 }
                 else if (sensorList[i][t->first].type == "file")
@@ -218,15 +218,22 @@ void updateMarginTempLoop(
 
                 if (sensorRealTemp != -1)
                 {
-                    sensorMarginTemp = (sensorSpecTemp - sensorRealTemp);
-                    sensorCalibTemp = sensorMarginTemp;
-                    auto offsetVal = calOffsetValue(skuConfig[i].first.first,
-                                                    sensorList[i][t->first].parametersScalar,
-                                                    sensorSpecTemp,
-                                                    sensorList[i][t->first].parametersTargetTemp,
-                                                    sensorList[i][t->first].parametersTargetTempOffset);
-                    sensorCalibTemp += offsetVal;
-                    sensorCalibTemp *= sensorList[i][t->first].parametersScalar;
+                    if (sensorList[i][t->first].parametersScalar == 0)
+                    {
+                        sensorCalibTemp = skuConfig[i].setpoint;
+                    }
+                    else
+                    {
+                        sensorMarginTemp = (sensorSpecTemp - sensorRealTemp);
+                        sensorCalibTemp = sensorMarginTemp;
+                        auto offsetVal = calOffsetValue(skuConfig[i].setpoint,
+                                                        sensorList[i][t->first].parametersScalar,
+                                                        sensorSpecTemp,
+                                                        sensorList[i][t->first].parametersTargetTemp,
+                                                        sensorList[i][t->first].parametersTargetTempOffset);
+                        sensorCalibTemp += offsetVal;
+                        sensorCalibTemp *= sensorList[i][t->first].parametersScalar;
+                    }
 
                     if (calibMarginTemp == -1 ||
                         sensorCalibTemp < calibMarginTemp)
@@ -236,7 +243,7 @@ void updateMarginTempLoop(
                 }
             }
 
-            updateDbusMarginTemp(i, calibMarginTemp, skuConfig[i].first.second);
+            updateDbusMarginTemp(i, calibMarginTemp, skuConfig[i].targetPath);
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
     }
