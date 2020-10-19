@@ -19,7 +19,8 @@ std::map<std::string, struct conf::sensorConfig>
  * @param[in] data - json data.
  * @return Sku config.
  */
-conf::skuConfig getSkuInfo(const nlohmann::json& data);
+std::map<int, conf::skuConfig>
+    getSkuInfo(const nlohmann::json& data);
 
 /**
  * Validate json data.

@@ -177,7 +177,7 @@ void updateDbusMarginTemp(int zoneNum, double marginTemp, std::string targetpath
 }
 
 void updateMarginTempLoop(
-    std::map<int, std::pair<std::pair<int, std::string>, std::vector<std::string>>> skuConfig,
+    conf::skuConfig skuConfig,
     std::map<std::string, struct conf::sensorConfig> sensorConfig)
 {
     std::fstream sensorTempFile;
@@ -191,7 +191,7 @@ void updateMarginTempLoop(
 
     for (int i = 0; i < numOfZones; i++)
     {
-        for (auto t = skuConfig[i].second.begin(); t != skuConfig[i].second.end(); t++)
+        for (auto t = skuConfig[i].components.begin(); t != skuConfig[i].components.end(); t++)
         {
             sensorList[i][*t] = sensorConfig[*t];
         }
@@ -322,21 +322,28 @@ void updateMarginTempLoop(
                     continue;
                 }
 
-                // Subtract to compute margin
-                sensorMarginTemp = (sensorSpecTemp - sensorRealTemp);
-                sensorCalibTemp = sensorMarginTemp;
+                if (sensorList[i][t->first].parametersScalar == 0)
+                {
+                    sensorCalibTemp = static_cast<double>(skuConfig[i].setpoint) / 1000.0;
+                }
+                else
+                {
+                    // Subtract to compute margin
+                    sensorMarginTemp = (sensorSpecTemp - sensorRealTemp);
+                    sensorCalibTemp = sensorMarginTemp;
 
-                // The first parameter: this is the setPoint, integer millidegrees
-                // parametersScalar: floating-point, this is unitless
-                // sensorSpecTemp: floating-point degrees
-                // parametersTargetTemp and TargetTempOffset: integer millidegrees
-                auto offsetVal = calOffsetValue(skuConfig[i].first.first,
-                                                sensorList[i][t->first].parametersScalar,
-                                                sensorSpecTemp,
-                                                sensorList[i][t->first].parametersTargetTemp,
-                                                sensorList[i][t->first].parametersTargetTempOffset);
-                sensorCalibTemp += offsetVal;
-                sensorCalibTemp *= sensorList[i][t->first].parametersScalar;
+                    // The first parameter: this is the setPoint, integer millidegrees
+                    // parametersScalar: floating-point, this is unitless
+                    // sensorSpecTemp: floating-point degrees
+                    // parametersTargetTemp and TargetTempOffset: integer millidegrees
+                    auto offsetVal = calOffsetValue(skuConfig[i].setpoint,
+                                                    sensorList[i][t->first].parametersScalar,
+                                                    sensorSpecTemp,
+                                                    sensorList[i][t->first].parametersTargetTemp,
+                                                    sensorList[i][t->first].parametersTargetTempOffset);
+                    sensorCalibTemp += offsetVal;
+                    sensorCalibTemp *= sensorList[i][t->first].parametersScalar;
+                }
 
                 // Remember this margin if it is the worst margin
                 if ((std::isnan(calibMarginTemp)) ||
@@ -358,7 +365,7 @@ void updateMarginTempLoop(
                 calibMarginTemp = 0;
             }
 
-            updateDbusMarginTemp(i, calibMarginTemp, skuConfig[i].first.second);
+            updateDbusMarginTemp(i, calibMarginTemp, skuConfig[i].targetPath);
 
             // Finish sensor line, indicate computed worst margin
             if constexpr (DEBUG)
