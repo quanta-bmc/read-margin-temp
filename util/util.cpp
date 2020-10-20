@@ -38,7 +38,7 @@ double getSensorDbusTemp(std::string sensorDbusPath, bool unitMilli)
 
     if (service.empty())
     {
-        std::cerr << "Sensor input path not mappable to service: " << sensorDbusPath << std::endl;
+        // std::cerr << "Sensor input path not mappable to service: " << sensorDbusPath << std::endl;
         return value;
     }
 
@@ -89,7 +89,7 @@ double getSpecTemp(struct conf::sensorConfig config)
 
     if (std::isnan(specTemp))
     {
-        std::cerr << "Sensor MaxTemp reading not available: " << config.parametersPath << std::endl;
+        // std::cerr << "Sensor MaxTemp reading not available: " << config.parametersPath << std::endl;
     }
     else
     {
@@ -148,13 +148,13 @@ std::string getService(const std::string path)
     }
     catch (const sdbusplus::exception::SdBusError& ex)
     {
-        std::cerr << "Get dbus service fail. " << ex.what() << std::endl;
+        // std::cerr << "Get dbus service fail. " << ex.what() << std::endl;
         return "";
     }
 
     if (response.begin() == response.end())
     {
-        std::cerr << "Sensor service not found: " << path << std::endl;
+        // std::cerr << "Sensor service not found: " << path << std::endl;
         return "";
     }
 
@@ -168,7 +168,7 @@ void updateDbusMarginTemp(int zoneNum, double marginTemp, std::string targetpath
 
     if (service.empty())
     {
-        std::cerr << "Sensor output path not mappable to service: " << targetpath << std::endl;
+        // std::cerr << "Sensor output path not mappable to service: " << targetpath << std::endl;
         return;
     }
 
