@@ -91,7 +91,7 @@ public:
         }
         catch (const std::exception& e)
         {
-            std::cerr << "Get dbus properties fail. " << e.what() << std::endl;
+            // std::cerr << "Get dbus properties fail. " << e.what() << std::endl;
             return value;
         }
 
@@ -119,7 +119,7 @@ public:
         // Sensors in floating-point use nan to indicate error
         if (std::isnan(value))
         {
-            std::cerr << "Sensor Value reading not available: " << path << std::endl;
+            // std::cerr << "Sensor Value reading not available: " << path << std::endl;
         }
         return value;
     }
