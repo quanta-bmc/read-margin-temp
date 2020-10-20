@@ -10,7 +10,7 @@ std::string getSensorHwmonNum(std::string partialPath)
 {
     auto dir = opendir(partialPath.c_str());
 
-    while ((dir != NULL) && ((drnt = readdir(dir)) != NULL)) 
+    while ((dir != NULL) && ((drnt = readdir(dir)) != NULL))
     {
         std::string hwmonNum(drnt->d_name);
         if (hwmonNum.find("hwmon") != std::string::npos)

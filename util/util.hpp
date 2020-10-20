@@ -19,7 +19,7 @@ int getSkuNum();
  * @param[in] sensorDbusPath - sensor dbus path.
  * @return Sensor temp.
  */
-int getSensorDbusTemp(std::string sensorDbusPath);
+double getSensorDbusTemp(std::string sensorDbusPath);
 
 /**
  * Get spec temp.
@@ -27,19 +27,19 @@ int getSensorDbusTemp(std::string sensorDbusPath);
  * @param[in] config - sensor config.
  * @return Spec temp of the sensor.
  */
-int getSpecTemp(struct conf::sensorConfig config);
+double getSpecTemp(struct conf::sensorConfig config);
 
 /**
  * Calculate margin offset value.
  *
- * @param[in] setPoint - zone setpoint.
- * @param[in] scalar - sensor scalar.
- * @param[in] maxTemp - sensor max temp.
- * @param[in] targetTemp - sensor target temp.
- * @param[in] targetOffset - sensor target temp offset.
+ * @param[in] setPoint - zone setpoint, integer millidegrees.
+ * @param[in] scalar - sensor scalar, floating-point, this is unitless.
+ * @param[in] maxTemp - sensor max temp, floating-point degrees.
+ * @param[in] targetTemp - sensor target temp, integer millidegrees.
+ * @param[in] targetOffset - sensor target temp offset, integer millidegrees.
  * @return Margin offset.
  */
-int calOffsetValue(int setPoint, double scalar, int maxTemp, int targetTemp, int targetOffset = 0);
+double calOffsetValue(int setPoint, double scalar, double maxTemp, int targetTemp, int targetOffset = 0);
 
 /**
  * Get dbus service name.
