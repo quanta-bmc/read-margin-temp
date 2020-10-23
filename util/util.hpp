@@ -4,7 +4,7 @@
 #include <vector>
 #include <string>
 
-#include "conf.hpp"
+#include "conf/conf.hpp"
 
 /**
  * Determine sku type.
@@ -20,26 +20,6 @@ int getSkuNum();
  * @return Sensor temp.
  */
 double getSensorDbusTemp(std::string sensorDbusPath);
-
-/**
- * Get spec temp.
- *
- * @param[in] config - sensor config.
- * @return Spec temp of the sensor.
- */
-double getSpecTemp(struct conf::sensorConfig config);
-
-/**
- * Calculate margin offset value.
- *
- * @param[in] setPoint - zone setpoint, integer millidegrees.
- * @param[in] scalar - sensor scalar, floating-point, this is unitless.
- * @param[in] maxTemp - sensor max temp, floating-point degrees.
- * @param[in] targetTemp - sensor target temp, integer millidegrees.
- * @param[in] targetOffset - sensor target temp offset, integer millidegrees.
- * @return Margin offset.
- */
-double calOffsetValue(int setPoint, double scalar, double maxTemp, int targetTemp, int targetOffset = 0);
 
 /**
  * Get dbus service name.
@@ -65,4 +45,4 @@ void updateDbusMarginTemp(int zoneNum, int64_t marginTemp, std::string targetpat
  */
 void updateMarginTempLoop(
     conf::skuConfig skuConfig,
-    std::map<std::string, struct conf::sensorConfig> sensorConfig);
+    std::map<std::string, conf::sensorComponents> sensorConfig);

@@ -4,13 +4,15 @@
 #include <string>
 #include <map>
 
+#include "conf/conf.hpp"
+
 /**
  * Parse sensor config from json data.
  *
  * @param[in] data - json data.
  * @return Json data.
  */
-std::map<std::string, struct conf::sensorConfig>
+std::map<std::string, conf::sensorComponents>
     getSensorInfo(const nlohmann::json& data);
 
 /**

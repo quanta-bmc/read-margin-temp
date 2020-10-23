@@ -1,7 +1,7 @@
 #include <fstream>
 #include <dirent.h>
 
-#include "conf.hpp"
+#include "conf/conf.hpp"
 #include "sensor/sensor.hpp"
 
 struct dirent *drnt;

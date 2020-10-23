@@ -5,12 +5,11 @@
 
 #include <nlohmann/json.hpp>
 
-#include "conf.hpp"
 #include "json/buildjson.hpp"
 
 namespace conf
 {
-void from_json(const nlohmann::json& jsonData, conf::sensorConfig& configItem)
+void from_json(const nlohmann::json& jsonData, conf::sensorComponents& configItem)
 {
     jsonData.at("name").get_to(configItem.name);
     jsonData.at("unit").get_to(configItem.unit);
@@ -36,15 +35,17 @@ void from_json(const nlohmann::json& jsonData, conf::zoneConfig& configItem)
 }
 }
 
-std::map<std::string, struct conf::sensorConfig>
+std::map<std::string, conf::sensorComponents>
     getSensorInfo(const nlohmann::json& data)
 {
-    std::map<std::string, struct conf::sensorConfig> config;
+    std::map<std::string, conf::sensorComponents> config;
     auto sensors = data["sensors"];
 
     for (const auto& sensor : sensors)
     {
-        config[sensor["name"]] = sensor.get<struct conf::sensorConfig>();
+        config[sensor["name"]] = sensor.get<conf::sensorComponents>();
+        config[sensor["name"]].determineUnit();
+        config[sensor["name"]].setSpecTemp();
     }
 
     return config;

@@ -11,6 +11,7 @@ executable(
     'read-margin-temp',
     [
         'main.cpp',
+        'conf/conf.cpp',
         'sensor/sensor.cpp',
         'util/util.cpp',
         'json/buildjson.cpp',

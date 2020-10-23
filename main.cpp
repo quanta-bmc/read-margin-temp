@@ -4,7 +4,7 @@
 
 #include <nlohmann/json.hpp>
 
-#include "conf.hpp"
+#include "conf/conf.hpp"
 #include "json/buildjson.hpp"
 #include "sensor/sensor.hpp"
 #include "util/util.hpp"
@@ -13,7 +13,7 @@
 constexpr auto marginConfigPath =
     "/usr/share/read-margin-temp/config-margin.json";
 
-std::map<std::string, struct conf::sensorConfig> sensorConfig = {};
+std::map<std::string, conf::sensorComponents> sensorConfig = {};
 std::map<int, conf::skuConfig> skusConfig;
 
 void run(const std::string& configPath)

@@ -10,7 +10,6 @@
 #include <sdbusplus/bus.hpp>
 #include <xyz/openbmc_project/Sensor/Value/server.hpp>
 
-#include "conf.hpp"
 #include "util/util.hpp"
 #include "sensor/sensor.hpp"
 #include "dbus/dbus.hpp"
@@ -44,88 +43,6 @@ double getSensorDbusTemp(std::string sensorDbusPath, bool unitMilli)
 
     value = dbus::SDBusPlus::getValueProperty(bus, service, sensorDbusPath, unitMilli);
     return value;
-}
-
-// As per documentation, specTemp unit, in config or filesystem, is always millidegrees
-// However, this function returns degrees
-double getSpecTemp(struct conf::sensorConfig config)
-{
-    double specTemp = std::numeric_limits<double>::quiet_NaN();
-
-    // As per documentation, -1 indicates "value comes from outside the config"
-    if (config.parametersMaxTemp != -1)
-    {
-        // The value is within the config itself, use it as-is
-        specTemp = static_cast<double>(config.parametersMaxTemp);
-
-        // Convert millidegrees to degrees
-        specTemp /= 1000.0;
-        return specTemp;
-    }
-
-    std::fstream sensorSpecFile;
-
-    if (config.parametersType == "sys")
-    {
-        std::string path;
-
-        path = getSysPath(config.parametersPath, config.parametersSysLabel);
-        sensorSpecFile.open(path, std::ios::in);
-        if (sensorSpecFile)
-        {
-            sensorSpecFile >> specTemp;
-            sensorSpecFile.close();
-        }
-    }
-    else if (config.parametersType == "file")
-    {
-        sensorSpecFile.open(config.parametersPath, std::ios::in);
-        if (sensorSpecFile)
-        {
-            sensorSpecFile >> specTemp;
-            sensorSpecFile.close();
-        }
-    }
-
-    if (std::isnan(specTemp))
-    {
-        // std::cerr << "Sensor MaxTemp reading not available: " << config.parametersPath << std::endl;
-    }
-    else
-    {
-        // Convert millidegrees to degrees
-        specTemp /= 1000.0;
-    }
-
-    return specTemp;
-}
-
-// Avoid losing precision by doing calculations as double
-double calOffsetValue(int setPointInt, double scalar, double maxTemp, int targetTempInt, int targetOffsetInt)
-{
-    // All integers are in millidegrees, convert to degrees
-    double setPoint = static_cast<double>(setPointInt);
-    setPoint /= 1000.0;
-    double targetOffset = static_cast<double>(targetOffsetInt);
-    targetOffset /= 1000.0;
-
-    double offsetvalue = 0.0;
-    offsetvalue = setPoint / scalar;
-
-    // If targetTemp not specified, use maxTemp instead
-    double targetTemp;
-    if (targetTempInt == -1)
-    {
-        targetTemp = maxTemp;
-    }
-    else
-    {
-        targetTemp = static_cast<double>(targetTempInt);
-        targetTemp /= 1000.0;
-    }
-
-    offsetvalue -= maxTemp - ( targetTemp + targetOffset );
-    return offsetvalue;
 }
 
 std::string getService(const std::string path)
@@ -178,7 +95,7 @@ void updateDbusMarginTemp(int zoneNum, double marginTemp, std::string targetpath
 
 void updateMarginTempLoop(
     conf::skuConfig skuConfig,
-    std::map<std::string, struct conf::sensorConfig> sensorConfig)
+    std::map<std::string, conf::sensorComponents> sensorConfig)
 {
     std::fstream sensorTempFile;
     int numOfZones = skuConfig.size();
@@ -187,7 +104,7 @@ void updateMarginTempLoop(
     double sensorMarginTemp;
     double sensorCalibTemp;
     double calibMarginTemp;
-    std::map<std::string, struct conf::sensorConfig> sensorList[numOfZones];
+    std::map<std::string, conf::sensorComponents> sensorList[numOfZones];
 
     for (int i = 0; i < numOfZones; i++)
     {
@@ -220,26 +137,14 @@ void updateMarginTempLoop(
 
             for (auto t = sensorList[i].begin(); t != sensorList[i].end(); t++)
             {
-                // Numbers from D-Bus or filesystem need to know their units
-                bool incomingMilli = false;
-                if ((sensorList[i][t->first].unit == "millidegree") || (sensorList[i][t->first].unit == "millimargin"))
-                {
-                   incomingMilli = true;
-                }
-
-                // Also need to know if units are absolute or margin
-                bool incomingMargin = false;
-                if ((sensorList[i][t->first].unit == "margin") || (sensorList[i][t->first].unit == "millimargin"))
-                {
-                    incomingMargin = true;
-                }
+                bool incomingMilli = sensorList[i][t->first].getUnitMilli();
+                bool incomingMargin = sensorList[i][t->first].getUnitMargin();
 
                 sensorRealTemp = std::numeric_limits<double>::quiet_NaN();
+                sensorSpecTemp = sensorList[i][t->first].getSpecTemp();
 
-                // This function already returns degrees
-                sensorSpecTemp =
-                    getSpecTemp(sensorList[i][t->first]);
 
+                // get sensor temperature
                 if (sensorList[i][t->first].type == "dbus")
                 {
                     // This function already returns degrees
@@ -322,25 +227,17 @@ void updateMarginTempLoop(
                     continue;
                 }
 
+                sensorList[i][t->first].setSetPointVal(skuConfig[i].setpoint);
                 if (sensorList[i][t->first].parametersScalar == 0)
                 {
-                    sensorCalibTemp = static_cast<double>(skuConfig[i].setpoint) / 1000.0;
+                    sensorCalibTemp = sensorList[i][t->first].getSetPointVal();
                 }
                 else
                 {
                     // Subtract to compute margin
                     sensorMarginTemp = (sensorSpecTemp - sensorRealTemp);
                     sensorCalibTemp = sensorMarginTemp;
-
-                    // The first parameter: this is the setPoint, integer millidegrees
-                    // parametersScalar: floating-point, this is unitless
-                    // sensorSpecTemp: floating-point degrees
-                    // parametersTargetTemp and TargetTempOffset: integer millidegrees
-                    auto offsetVal = calOffsetValue(skuConfig[i].setpoint,
-                                                    sensorList[i][t->first].parametersScalar,
-                                                    sensorSpecTemp,
-                                                    sensorList[i][t->first].parametersTargetTemp,
-                                                    sensorList[i][t->first].parametersTargetTempOffset);
+                    auto offsetVal = sensorList[i][t->first].getOffsetVal();
                     sensorCalibTemp += offsetVal;
                     sensorCalibTemp *= sensorList[i][t->first].parametersScalar;
                 }
