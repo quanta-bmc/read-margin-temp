@@ -48,7 +48,7 @@ double getSensorDbusTemp(std::string sensorDbusPath, bool unitMilli)
 
 // As per documentation, specTemp unit, in config or filesystem, is always millidegrees
 // However, this function returns degrees
-double getSpecTemp(struct conf::sensorConfig config)
+double getSpecTemp(struct conf::SensorConfig config)
 {
     double specTemp = std::numeric_limits<double>::quiet_NaN();
 
@@ -109,8 +109,8 @@ double calOffsetValue(int setPointInt, double scalar, double maxTemp, int target
     double targetOffset = static_cast<double>(targetOffsetInt);
     targetOffset /= 1000.0;
 
-    double offsetvalue = 0.0;
-    offsetvalue = setPoint / scalar;
+    double offsetValue = 0.0;
+    offsetValue = setPoint / scalar;
 
     // If targetTemp not specified, use maxTemp instead
     double targetTemp;
@@ -124,8 +124,8 @@ double calOffsetValue(int setPointInt, double scalar, double maxTemp, int target
         targetTemp /= 1000.0;
     }
 
-    offsetvalue -= maxTemp - ( targetTemp + targetOffset );
-    return offsetvalue;
+    offsetValue -= maxTemp - ( targetTemp + targetOffset );
+    return offsetValue;
 }
 
 std::string getService(const std::string path)
@@ -177,8 +177,8 @@ void updateDbusMarginTemp(int zoneNum, double marginTemp, std::string targetpath
 }
 
 void updateMarginTempLoop(
-    conf::skuConfig skuConfig,
-    std::map<std::string, struct conf::sensorConfig> sensorConfig)
+    conf::SkuConfig skuConfig,
+    std::map<std::string, struct conf::SensorConfig> sensorConfig)
 {
     std::fstream sensorTempFile;
     int numOfZones = skuConfig.size();
@@ -187,7 +187,7 @@ void updateMarginTempLoop(
     double sensorMarginTemp;
     double sensorCalibTemp;
     double calibMarginTemp;
-    std::map<std::string, struct conf::sensorConfig> sensorList[numOfZones];
+    std::map<std::string, struct conf::SensorConfig> sensorList[numOfZones];
 
     for (int i = 0; i < numOfZones; i++)
     {
@@ -324,7 +324,7 @@ void updateMarginTempLoop(
 
                 if (sensorList[i][t->first].parametersScalar == 0)
                 {
-                    sensorCalibTemp = static_cast<double>(skuConfig[i].setpoint) / 1000.0;
+                    sensorCalibTemp = static_cast<double>(skuConfig[i].setPoint) / 1000.0;
                 }
                 else
                 {
@@ -336,7 +336,7 @@ void updateMarginTempLoop(
                     // parametersScalar: floating-point, this is unitless
                     // sensorSpecTemp: floating-point degrees
                     // parametersTargetTemp and TargetTempOffset: integer millidegrees
-                    auto offsetVal = calOffsetValue(skuConfig[i].setpoint,
+                    auto offsetVal = calOffsetValue(skuConfig[i].setPoint,
                                                     sensorList[i][t->first].parametersScalar,
                                                     sensorSpecTemp,
                                                     sensorList[i][t->first].parametersTargetTemp,
