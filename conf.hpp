@@ -6,7 +6,7 @@
 
 namespace conf
 {
-struct sensorConfig
+struct SensorConfig
 {
     std::string name;
     std::string unit;
@@ -23,13 +23,13 @@ struct sensorConfig
     double parametersScalar;
 };
 
-struct zoneConfig
+struct ZoneConfig
 {
     int id;
-    int setpoint;
+    int setPoint;
     std::string targetPath;
     std::vector<std::string> components;
 };
 
-using skuConfig = std::map<int, conf::zoneConfig>;
+using SkuConfig = std::map<int, conf::ZoneConfig>;
 }

@@ -27,7 +27,7 @@ double getSensorDbusTemp(std::string sensorDbusPath, bool unitMilli);
  * @param[in] config - sensor config.
  * @return Spec temp of the sensor.
  */
-double getSpecTemp(struct conf::sensorConfig config);
+double getSpecTemp(struct conf::SensorConfig config);
 
 /**
  * Calculate margin offset value.
@@ -39,7 +39,11 @@ double getSpecTemp(struct conf::sensorConfig config);
  * @param[in] targetOffsetInt - sensor target temp offset, integer millidegrees.
  * @return Margin offset.
  */
-double calOffsetValue(int setPointInt, double scalar, double maxTemp, int targetTempInt, int targetOffsetInt);
+double calOffsetValue(int setPointInt,
+                      double scalar,
+                      double maxTemp,
+                      int targetTempInt,
+                      int targetOffsetInt);
 
 /**
  * Get dbus service name.
@@ -56,7 +60,9 @@ std::string getService(const std::string dbusPath);
  * @param[in] marginTemp - margin temp.
  * @param[in] targetPath - target Dbus path to save margin temp
  */
-void updateDbusMarginTemp(int zoneNum, double marginTemp, std::string targetpath);
+void updateDbusMarginTemp(int zoneNum,
+                          double marginTemp,
+                          std::string targetPath);
 
 /**
  * Calculate and update margin temp every second.
@@ -65,5 +71,5 @@ void updateDbusMarginTemp(int zoneNum, double marginTemp, std::string targetpath
  * @param[in] sensorConfig - sensor config.
  */
 void updateMarginTempLoop(
-    conf::skuConfig skuConfig,
-    std::map<std::string, struct conf::sensorConfig> sensorConfig);
+        conf::SkuConfig skuConfig,
+        std::map<std::string, struct conf::SensorConfig> sensorConfig);

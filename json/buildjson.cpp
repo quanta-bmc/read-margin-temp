@@ -10,7 +10,7 @@
 
 namespace conf
 {
-void from_json(const nlohmann::json& jsonData, conf::sensorConfig& configItem)
+void from_json(const nlohmann::json& jsonData, conf::SensorConfig& configItem)
 {
     jsonData.at("name").get_to(configItem.name);
     jsonData.at("unit").get_to(configItem.unit);
@@ -27,44 +27,43 @@ void from_json(const nlohmann::json& jsonData, conf::sensorConfig& configItem)
     parameters.at("scalar").get_to(configItem.parametersScalar);
 }
 
-void from_json(const nlohmann::json& jsonData, conf::zoneConfig& configItem)
+void from_json(const nlohmann::json& jsonData, conf::ZoneConfig& configItem)
 {
     jsonData.at("id").get_to(configItem.id);
-    jsonData.at("zoneSetpoint").get_to(configItem.setpoint);
+    jsonData.at("zoneSetpoint").get_to(configItem.setPoint);
     jsonData.at("target").get_to(configItem.targetPath);
     jsonData.at("components").get_to(configItem.components);
 }
 }
 
-std::map<std::string, struct conf::sensorConfig>
+std::map<std::string, struct conf::SensorConfig>
     getSensorInfo(const nlohmann::json& data)
 {
-    std::map<std::string, struct conf::sensorConfig> config;
+    std::map<std::string, struct conf::SensorConfig> config;
     auto sensors = data["sensors"];
 
     for (const auto& sensor : sensors)
     {
-        config[sensor["name"]] = sensor.get<struct conf::sensorConfig>();
+        config[sensor["name"]] = sensor.get<struct conf::SensorConfig>();
     }
 
     return config;
 }
 
-std::map<int, conf::skuConfig>
-    getSkuInfo(const nlohmann::json& data)
+std::map<int, conf::SkuConfig> getSkuInfo(const nlohmann::json& data)
 {
-    std::map<int, conf::skuConfig> skusConfig;
+    std::map<int, conf::SkuConfig> skusConfig;
     auto skus = data["skus"];
 
     for (const auto& sku : skus)
     {
-        conf::skuConfig skuZonesInfo;
+        conf::SkuConfig skuZonesInfo;
         auto num = sku["num"];
         auto zones = sku["zones"];
 
         for (const auto& zone : zones)
         {
-            skuZonesInfo[zone["id"]] = zone.get<struct conf::zoneConfig>();
+            skuZonesInfo[zone["id"]] = zone.get<struct conf::ZoneConfig>();
         }
         skusConfig[num] = skuZonesInfo;
     }
