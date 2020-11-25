@@ -128,7 +128,7 @@ double calOffsetValue(int setPointInt, double scalar, double maxTemp, int target
     return offsetvalue;
 }
 
-std::string getService(const std::string path)
+std::string getService(const std::string dbusPath)
 {
     auto bus = sdbusplus::bus::new_system();
     auto mapper =
@@ -136,7 +136,7 @@ std::string getService(const std::string path)
                             "/xyz/openbmc_project/object_mapper",
                             "xyz.openbmc_project.ObjectMapper", "GetObject");
 
-    mapper.append(path);
+    mapper.append(dbusPath);
     mapper.append(std::vector<std::string>({"xyz.openbmc_project.Sensor.Value"}));
 
     std::map<std::string, std::vector<std::string>> response;
@@ -154,7 +154,7 @@ std::string getService(const std::string path)
 
     if (response.begin() == response.end())
     {
-        // std::cerr << "Sensor service not found: " << path << std::endl;
+        // std::cerr << "Sensor service not found: " << dbusPath << std::endl;
         return "";
     }
 
