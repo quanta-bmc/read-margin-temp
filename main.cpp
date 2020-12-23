@@ -10,11 +10,11 @@
 #include "util/util.hpp"
 #include "dbus/dbus.hpp"
 
-constexpr auto marginConfigPath =
+constexpr auto MARGINCONFIGPATH =
     "/usr/share/read-margin-temp/config-margin.json";
 
-std::map<std::string, struct conf::sensorConfig> sensorConfig = {};
-std::map<int, conf::skuConfig> skusConfig;
+std::map<std::string, struct conf::SensorConfig> sensorConfig = {};
+std::map<int, conf::SkuConfig> skusConfig;
 
 void run(const std::string& configPath)
 {
@@ -42,7 +42,7 @@ void run(const std::string& configPath)
 
 int main(int argc, char **argv)
 {
-    std::string configPath = marginConfigPath;
+    std::string configPath = MARGINCONFIGPATH;
 
     if (argc > 1)
     {
