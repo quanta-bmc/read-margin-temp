@@ -19,7 +19,8 @@ sku configurations. The detailed introduction is listed below.
         * "name": "cpu0",           /* name of the sensor */
         * "unit": "millidegree",    /* temperature unit: millidegree, degree, millimargin */
         * "type": "dbus",           /* temperature reading path type: dbus, sys */
-        * "path": "/xyz/openbmc_project/sensors/temperature/cpu0",   /* temperature reading dbus or sys path */
+        * "service": "",           /* temperature reading dbus service path, default will use object mapper to get service*/
+        * "path": "/xyz/openbmc_project/sensors/temperature/cpu0",   /* temperature reading dbus object path or sys path */
         * "parameters": {
             * "type": "sys",        /* spec temperature reading type: sys, file */
             * "specTemp": -1,       /* fixed spec temperature, -1 for not fixed, unit: millidegree */

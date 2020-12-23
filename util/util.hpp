@@ -16,10 +16,13 @@ int getSkuNum();
 /**
  * Get sensor temp from dbus.
  *
- * @param[in] sensorDbusPath - sensor dbus path.
+ * @param[in] sensorServicePath - sensor service path.
+ * @param[in] sensorDbusPath - sensor dbus object path.
  * @return Sensor temp.
  */
-double getSensorDbusTemp(std::string sensorDbusPath, bool unitMilli);
+double getSensorDbusTemp(const std::string sensorServicePath,
+                         const std::string sensorDbusPath,
+                         bool unitMilli);
 
 /**
  * Get spec temp.

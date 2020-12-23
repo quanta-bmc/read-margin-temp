@@ -11,6 +11,7 @@ struct SensorConfig
     std::string name;
     std::string unit;
     std::string type;
+    std::string service;
     std::string path;
 
     /** parameters info **/

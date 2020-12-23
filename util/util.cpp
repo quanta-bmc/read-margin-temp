@@ -29,10 +29,21 @@ int getSkuNum()
     return 1;
 }
 
-double getSensorDbusTemp(std::string sensorDbusPath, bool unitMilli)
+double getSensorDbusTemp(const std::string sensorServicePath,
+                         const std::string sensorDbusPath,
+                         bool unitMilli)
 {
     auto bus = sdbusplus::bus::new_default();
-    std::string service = getService(sensorDbusPath);
+    std::string service;
+
+    if (sensorServicePath == "")
+    {
+        service = getService(sensorDbusPath);
+    }
+    else
+    {
+        service = sensorServicePath;
+    }
 
     double value = std::numeric_limits<double>::quiet_NaN();
 
@@ -259,7 +270,9 @@ void updateMarginTempLoop(
                 {
                     // This function already returns degrees
                     sensorRealTemp =
-                        getSensorDbusTemp(sensorList[i][t->first].path, incomingMilli);
+                        getSensorDbusTemp(sensorList[i][t->first].service,
+                                          sensorList[i][t->first].path,
+                                          incomingMilli);
                 }
                 else
                 {

@@ -15,6 +15,7 @@ void from_json(const nlohmann::json& jsonData, conf::SensorConfig& configItem)
     jsonData.at("name").get_to(configItem.name);
     jsonData.at("unit").get_to(configItem.unit);
     jsonData.at("type").get_to(configItem.type);
+    jsonData.at("service").get_to(configItem.service);
     jsonData.at("path").get_to(configItem.path);
 
     auto parameters = jsonData.at("parameters");
