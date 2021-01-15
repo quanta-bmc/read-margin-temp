@@ -13,6 +13,12 @@
 constexpr auto MARGINCONFIGPATH =
     "/usr/share/read-margin-temp/config-margin.json";
 
+constexpr auto debugEnablePath = "/etc/thermal.d/margindebug";
+extern bool debugEnabled;
+
+constexpr auto spofDisablePath = "/etc/thermal.d/spofdisable";
+extern bool spofEnabled;
+
 std::map<std::string, struct conf::SensorConfig> sensorConfig = {};
 std::map<int, conf::SkuConfig> skusConfig;
 
@@ -47,6 +53,24 @@ int main(int argc, char **argv)
     if (argc > 1)
     {
         configPath = argv[1];
+    }
+
+    debugEnabled = false;
+    if (std::filesystem::exists(debugEnablePath))
+    {
+        debugEnabled = true;
+        std::cerr << "Debug logging enabled\n";
+    }
+
+    // TODO(): This changes default behavior,
+    // from fail-if-all to fail-if-one sensor broken,
+    // which may be surprising to other users,
+    // so consider changing this before releasing.
+    spofEnabled = true;
+    if (std::filesystem::exists(spofDisablePath))
+    {
+        spofEnabled = false;
+        std::cerr << "Single point of failure disabled\n";
     }
 
     run(configPath);

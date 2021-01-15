@@ -121,7 +121,7 @@ class SDBusPlus
             }
 
             // Sensors in floating-point use nan to indicate error
-            if (std::isnan(value))
+            if (!(std::isfinite(value)))
             {
                 // std::cerr << "Sensor Value reading not available: " << path << std::endl;
             }

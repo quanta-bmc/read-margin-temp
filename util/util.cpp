@@ -18,6 +18,9 @@
 // Enables logging of margin decisions
 static constexpr bool DEBUG = false;
 
+// Enables single-point-of-failure behavior
+bool spofEnabled = false;
+
 int getSkuNum()
 {
     /**
@@ -27,6 +30,27 @@ int getSkuNum()
      */
 
     return 1;
+}
+
+double readDoubleOrNan(std::istream& is)
+{
+    double value = std::numeric_limits<double>::quiet_NaN();
+
+    // Consume stream until whitespace or end encountered
+    std::string text;
+    is >> text;
+
+    // Use idx for error detection
+    size_t idx;
+    double parsed = std::stod(text, &idx);
+
+    // Ensure string non-empty and entire string length parsed
+    if ( (idx > 0) && (idx == text.size()) )
+    {
+        value = parsed;
+    }
+
+    return value;
 }
 
 double getSensorDbusTemp(std::string sensorDbusPath, bool unitMilli)
@@ -76,7 +100,7 @@ double getSpecTemp(struct conf::SensorConfig config)
         sensorSpecFile.open(path, std::ios::in);
         if (sensorSpecFile)
         {
-            sensorSpecFile >> specTemp;
+            specTemp = readDoubleOrNan(sensorSpecFile);
             sensorSpecFile.close();
         }
     }
@@ -85,12 +109,12 @@ double getSpecTemp(struct conf::SensorConfig config)
         sensorSpecFile.open(config.parametersPath, std::ios::in);
         if (sensorSpecFile)
         {
-            sensorSpecFile >> specTemp;
+            specTemp = readDoubleOrNan(sensorSpecFile);
             sensorSpecFile.close();
         }
     }
 
-    if (std::isnan(specTemp))
+    if (!(std::isfinite(specTemp)))
     {
         // std::cerr << "Sensor MaxTemp reading not available: " << config.parametersPath << std::endl;
     }
@@ -228,6 +252,8 @@ void updateMarginTempLoop(
                 std::cerr << "Margin Zone " << t->first << ":";
             }
 
+            bool errorEncountered = false;
+
             // Standardize on floating-point degrees for all computations
             calibMarginTemp = std::numeric_limits<double>::quiet_NaN();
 
@@ -271,8 +297,13 @@ void updateMarginTempLoop(
                         sensorTempFile.open(path, std::ios::in);
                         if (sensorTempFile)
                         {
-                            sensorTempFile >> sensorRealTemp;
+                            sensorRealTemp = readDoubleOrNan(sensorTempFile);
                             sensorTempFile.close();
+                        }
+                        else
+                        {
+                            // TODO(): Error message, with throttling, here
+                            errorEncountered = true;
                         }
                     }
                     else if (sensorList[i][t->first].type == "file")
@@ -281,12 +312,17 @@ void updateMarginTempLoop(
                         sensorValueFile.open(sensorList[i][t->first].path, std::ios::in);
                         if (sensorValueFile)
                         {
-                            sensorValueFile >> sensorRealTemp;
+                            sensorRealTemp = readDoubleOrNan(sensorValueFile);
                             sensorValueFile.close();
+                        }
+                        else
+                        {
+                            // TODO(): Error message, with throttling, here
+                            errorEncountered = true;
                         }
                     }
 
-                    if (!(std::isnan(sensorRealTemp)))
+                    if (std::isfinite(sensorRealTemp))
                     {
                         // If configured unit not already degrees, convert to degrees
                         if (incomingMilli)
@@ -294,10 +330,17 @@ void updateMarginTempLoop(
                             sensorRealTemp /= 1000.0;
                         }
                     }
+                    else
+                    {
+                        // TODO(): Error message, with throttling, here
+                        errorEncountered = true;
+                    }
                 }
 
-                if (std::isnan(sensorRealTemp))
+                if (!(std::isfinite(sensorRealTemp)))
                 {
+                    errorEncountered = true;
+
                     // Sensor failure, unable to get reading
                     if constexpr (DEBUG)
                     {
@@ -311,7 +354,7 @@ void updateMarginTempLoop(
                 if (incomingMargin)
                 {
                     // Remember this margin if it is the worst margin
-                    if (std::isnan(calibMarginTemp) ||
+                    if ( (!(std::isfinite(calibMarginTemp))) ||
                         sensorRealTemp < calibMarginTemp)
                     {
                         calibMarginTemp = sensorRealTemp;
@@ -326,8 +369,10 @@ void updateMarginTempLoop(
                     continue;
                 }
 
-                if (std::isnan(sensorSpecTemp))
+                if (!(std::isfinite(sensorSpecTemp)))
                 {
+                    errorEncountered = true;
+
                     // Sensor failure, needed to know sensorSpecTemp to compute margin
                     if constexpr (DEBUG)
                     {
@@ -362,7 +407,7 @@ void updateMarginTempLoop(
                 }
 
                 // Remember this margin if it is the worst margin
-                if (std::isnan(calibMarginTemp) ||
+                if ( (!(std::isfinite(calibMarginTemp))) ||
                     sensorCalibTemp < calibMarginTemp)
                 {
                     calibMarginTemp = sensorCalibTemp;
@@ -375,10 +420,23 @@ void updateMarginTempLoop(
                 }
             }
 
-            // If all sensors failed, conservatively assume we have no margin
-            if (std::isnan(calibMarginTemp))
+            // If all sensors failed, provide NaN as output,
+            // unlike previous versions, which provided 0 as output,
+            // which was incorrect and misleading.
+            // The latest version of phosphor-pid-control will accept NaN
+            // correctly, and use it as an indication of a broken sensor,
+            // to properly throw the thermal zone into failsafe mode.
+            if (!(std::isfinite(calibMarginTemp)))
             {
-                calibMarginTemp = 0;
+                calibMarginTemp = std::numeric_limits<double>::quiet_NaN();
+            }
+
+            // If any sensors failed, propagate the failure, instead of
+            // simply dropping the failed sensors from the computation,
+            // if single-point-of-failure mode is active.
+            if (spofEnabled && errorEncountered)
+            {
+                calibMarginTemp = std::numeric_limits<double>::quiet_NaN();
             }
 
             updateDbusMarginTemp(i, calibMarginTemp, skuConfig[i].targetPath);
