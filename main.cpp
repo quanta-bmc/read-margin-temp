@@ -20,6 +20,8 @@ extern bool debugEnabled;
 constexpr auto spofDisablePath = "/etc/thermal.d/spofdisable";
 extern bool spofEnabled;
 
+extern bool ignoreEnable;
+
 std::map<std::string, struct conf::SensorConfig> sensorConfig = {};
 std::map<int, conf::SkuConfig> skusConfig;
 
@@ -31,7 +33,10 @@ void printHelp()
     std::cout << "        default : " << MARGINCONFIGPATH << std::endl;
     std::cout << "    --loose, -l : ignore a sensor lost"
               << std::endl;
-    std::cout << "        default : consider sensor lost" << std::endl;
+    std::cout << "    --debug, -d : enable debug mode to print log"
+              << std::endl;
+    std::cout << "    --ignore, -g : enable to ignore if sensor service is empty"
+              << std::endl;
     std::cout << "" << std::endl;
 }
 
@@ -63,7 +68,7 @@ int main(int argc, char **argv)
 {
     std::string configPath = MARGINCONFIGPATH;
 
-    bool inValiedoption = false;
+    bool invalidOption = false;
 
     debugEnabled = false;
     if (std::filesystem::exists(debugEnablePath))
@@ -94,14 +99,22 @@ int main(int argc, char **argv)
         {
             spofEnabled = false;
         }
+        else if (std::strcmp(argv[i], "--debug") == 0 || std::strcmp(argv[i], "-d") == 0)
+        {
+            debugEnabled = true;
+        }
+        else if (std::strcmp(argv[i], "--ignore") == 0 || std::strcmp(argv[i], "-g") == 0)
+        {
+            ignoreEnable = true;
+        }
         else
         {
-            inValiedoption = true;
+            invalidOption = true;
             printHelp();
         }
     }
 
-    if (!inValiedoption)
+    if (!invalidOption)
     {
         run(configPath);
     }

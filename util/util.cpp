@@ -22,8 +22,10 @@ bool spofEnabled = false;
 // Enables logging of margin decisions
 bool debugEnabled = false;
 
-// Flag for sensor fail
-bool errorEncountered = false;
+// Enable ignore empty sensor service failure
+bool ignoreEnable = false;
+
+bool emptyService = false;
 
 int getSkuNum()
 {
@@ -66,6 +68,10 @@ double getSensorDbusTemp(std::string sensorDbusPath, bool unitMilli)
 
     if (service.empty())
     {
+        if (ignoreEnable)
+        {
+            emptyService = true;
+        }
         // std::cerr << "Sensor input path not mappable to service: " << sensorDbusPath << std::endl;
         return value;
     }
@@ -77,12 +83,6 @@ double getSensorDbusTemp(std::string sensorDbusPath, bool unitMilli)
                                                       service,
                                                       sensorDbusPath))
         {
-            dbus::SDBusPlus::setValueProperty(bus,
-                                              service,
-                                              sensorDbusPath,
-                                              value,
-                                              false);
-            errorEncountered = true;
             return value;
         }
 
@@ -91,7 +91,6 @@ double getSensorDbusTemp(std::string sensorDbusPath, bool unitMilli)
                                                   sensorDbusPath,
                                                   "WarningAlarmHigh"))
         {
-            errorEncountered = true;
             return value;
         }
         if (dbus::SDBusPlus::checkWarningProperty(bus,
@@ -99,7 +98,6 @@ double getSensorDbusTemp(std::string sensorDbusPath, bool unitMilli)
                                                   sensorDbusPath,
                                                   "WarningAlarmLow"))
         {
-            errorEncountered = true;
             return value;
         }
 
@@ -108,7 +106,6 @@ double getSensorDbusTemp(std::string sensorDbusPath, bool unitMilli)
                                                    sensorDbusPath,
                                                    "CriticalAlarmHigh"))
         {
-            errorEncountered = true;
             return value;
         }
         if (dbus::SDBusPlus::checkCriticalProperty(bus,
@@ -116,7 +113,6 @@ double getSensorDbusTemp(std::string sensorDbusPath, bool unitMilli)
                                                    sensorDbusPath,
                                                    "CriticalAlarmLow"))
         {
-            errorEncountered = true;
             return value;
         }
     }
@@ -125,11 +121,6 @@ double getSensorDbusTemp(std::string sensorDbusPath, bool unitMilli)
                                               service,
                                               sensorDbusPath,
                                               unitMilli);
-
-    if (!(std::isfinite(value)))
-    {
-        errorEncountered = true;
-    }
 
     return value;
 }
@@ -313,13 +304,15 @@ void updateMarginTempLoop(
                 std::cerr << "Margin Zone " << t->first << ":";
             }
 
-            errorEncountered = false;
+            bool errorEncountered = false;
 
             // Standardize on floating-point degrees for all computations
             calibMarginTemp = std::numeric_limits<double>::quiet_NaN();
 
             for (auto t = sensorList[i].begin(); t != sensorList[i].end(); t++)
             {
+                emptyService = false;
+
                 // Numbers from D-Bus or filesystem need to know their units
                 bool incomingMilli = false;
                 if (sensorList[i][t->first].unit == "millidegree" ||
@@ -401,6 +394,10 @@ void updateMarginTempLoop(
 
                 if (!(std::isfinite(sensorRealTemp)))
                 {
+                    if (emptyService)
+                    {
+                        continue;
+                    }
                     errorEncountered = true;
 
                     // Sensor failure, unable to get reading
