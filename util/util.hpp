@@ -17,6 +17,7 @@ int getSkuNum();
  * Get sensor temp from dbus.
  *
  * @param[in] sensorDbusPath - sensor dbus path.
+ * @param[in] unitMilli - the value is degree(false) or millidegree(true)
  * @return Sensor temp.
  */
 double getSensorDbusTemp(std::string sensorDbusPath, bool unitMilli);

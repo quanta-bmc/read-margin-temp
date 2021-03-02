@@ -15,11 +15,17 @@
 #include "sensor/sensor.hpp"
 #include "dbus/dbus.hpp"
 
-// Enables logging of margin decisions
-static constexpr bool DEBUG = false;
 
 // Enables single-point-of-failure behavior
 bool spofEnabled = false;
+
+// Enables logging of margin decisions
+bool debugEnabled = false;
+
+// Enable ignore empty sensor service failure
+bool ignoreEnable = false;
+
+bool emptyService = false;
 
 int getSkuNum()
 {
@@ -62,14 +68,60 @@ double getSensorDbusTemp(std::string sensorDbusPath, bool unitMilli)
 
     if (service.empty())
     {
+        if (ignoreEnable)
+        {
+            emptyService = true;
+        }
         // std::cerr << "Sensor input path not mappable to service: " << sensorDbusPath << std::endl;
         return value;
+    }
+
+    if (spofEnabled)
+    {
+        // If sensor functional property is false, set NaN to dbus and return NaN.
+        if (!dbus::SDBusPlus::checkFunctionalProperty(bus,
+                                                      service,
+                                                      sensorDbusPath))
+        {
+            return value;
+        }
+
+        if (dbus::SDBusPlus::checkWarningProperty(bus,
+                                                  service,
+                                                  sensorDbusPath,
+                                                  "WarningAlarmHigh"))
+        {
+            return value;
+        }
+        if (dbus::SDBusPlus::checkWarningProperty(bus,
+                                                  service,
+                                                  sensorDbusPath,
+                                                  "WarningAlarmLow"))
+        {
+            return value;
+        }
+
+        if (dbus::SDBusPlus::checkCriticalProperty(bus,
+                                                   service,
+                                                   sensorDbusPath,
+                                                   "CriticalAlarmHigh"))
+        {
+            return value;
+        }
+        if (dbus::SDBusPlus::checkCriticalProperty(bus,
+                                                   service,
+                                                   sensorDbusPath,
+                                                   "CriticalAlarmLow"))
+        {
+            return value;
+        }
     }
 
     value = dbus::SDBusPlus::getValueProperty(bus,
                                               service,
                                               sensorDbusPath,
                                               unitMilli);
+
     return value;
 }
 
@@ -239,7 +291,7 @@ void updateMarginTempLoop(
         for (int i = 0; i < numOfZones; i++)
         {
             // Begin a new zone line of space-separated sensors
-            if constexpr (DEBUG)
+            if (debugEnabled)
             {
                 // Get the map key at the Nth position within the map
                 auto t = skuConfig.begin();
@@ -259,6 +311,8 @@ void updateMarginTempLoop(
 
             for (auto t = sensorList[i].begin(); t != sensorList[i].end(); t++)
             {
+                emptyService = false;
+
                 // Numbers from D-Bus or filesystem need to know their units
                 bool incomingMilli = false;
                 if (sensorList[i][t->first].unit == "millidegree" ||
@@ -285,7 +339,8 @@ void updateMarginTempLoop(
                 {
                     // This function already returns degrees
                     sensorRealTemp =
-                        getSensorDbusTemp(sensorList[i][t->first].path, incomingMilli);
+                        getSensorDbusTemp(sensorList[i][t->first].path,
+                                          incomingMilli);
                 }
                 else
                 {
@@ -339,10 +394,14 @@ void updateMarginTempLoop(
 
                 if (!(std::isfinite(sensorRealTemp)))
                 {
+                    if (emptyService)
+                    {
+                        continue;
+                    }
                     errorEncountered = true;
 
                     // Sensor failure, unable to get reading
-                    if constexpr (DEBUG)
+                    if (debugEnabled)
                     {
                         std::cerr << " ?";
                     }
@@ -361,7 +420,7 @@ void updateMarginTempLoop(
                     }
 
                     // Sensor successful, already in margin format
-                    if constexpr (DEBUG)
+                    if (debugEnabled)
                     {
                         std::cerr << " " << sensorRealTemp;
                     }
@@ -374,7 +433,7 @@ void updateMarginTempLoop(
                     errorEncountered = true;
 
                     // Sensor failure, needed to know sensorSpecTemp to compute margin
-                    if constexpr (DEBUG)
+                    if (debugEnabled)
                     {
                         std::cerr << " ?";
                     }
@@ -414,7 +473,7 @@ void updateMarginTempLoop(
                 }
 
                 // Sensor successful, converted absolute to margin
-                if constexpr (DEBUG)
+                if (debugEnabled)
                 {
                     std::cerr << " " << sensorCalibTemp;
                 }
@@ -442,7 +501,7 @@ void updateMarginTempLoop(
             updateDbusMarginTemp(i, calibMarginTemp, skuConfig[i].targetPath);
 
             // Finish sensor line, indicate computed worst margin
-            if constexpr (DEBUG)
+            if (debugEnabled)
             {
                 std::cerr << " => " << calibMarginTemp << std::endl;
             }

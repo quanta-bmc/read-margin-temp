@@ -1,16 +1,20 @@
 # read-margin-temp
 
 This daemon is to calculate and update margin temperatures for
-[fan PID control](https://github.com/openbmc/phosphor-pid-control). The margin
-temperatures are updated one by one with 1 second interval between each zone.
-The unit of margin temperature is millidegree.
+[fan PID control](https://github.com/openbmc/phosphor-pid-control).   
+The margin temperatures are updated one by one with 1 second interval between each zone.  
+The unit of margin temperature is millidegree.  
+This daemon will check sensor threshold and functional dbus property.
+If functional dbus is false, which means driver is not update value to dbus, 
+it will set NaN to sensor dbus value.
 
 ## Configuration File
 
-The configuration file has "sensors" and "skus" parts. The "sensors" part
-contains all the information of sensors, including paths for temperature
-reading and paths for spec temperature. The "skus" part has the list of all
-sku configurations. The detailed introduction is listed below.
+The configuration file has "sensors" and "skus" parts.  
+The "sensors" part contains all the information of sensors,
+including paths for temperature reading and paths for spec temperature.  
+The "skus" part has the list of all sku configurations.  
+The detailed introduction is listed below.
 
 # Sensor Configuration
 

@@ -1,4 +1,5 @@
 #include <iostream>
+#include <filesystem>
 #include <string>
 #include <map>
 
@@ -19,8 +20,25 @@ extern bool debugEnabled;
 constexpr auto spofDisablePath = "/etc/thermal.d/spofdisable";
 extern bool spofEnabled;
 
+extern bool ignoreEnable;
+
 std::map<std::string, struct conf::SensorConfig> sensorConfig = {};
 std::map<int, conf::SkuConfig> skusConfig;
+
+void printHelp()
+{
+    std::cout << "Option : " << std::endl;
+    std::cout << "    --file, -f [path]: the direct path of config file"
+              << std::endl;
+    std::cout << "        default : " << MARGINCONFIGPATH << std::endl;
+    std::cout << "    --loose, -l : ignore a sensor lost"
+              << std::endl;
+    std::cout << "    --debug, -d : enable debug mode to print log"
+              << std::endl;
+    std::cout << "    --ignore, -g : enable to ignore if sensor service is empty"
+              << std::endl;
+    std::cout << "" << std::endl;
+}
 
 void run(const std::string& configPath)
 {
@@ -50,10 +68,7 @@ int main(int argc, char **argv)
 {
     std::string configPath = MARGINCONFIGPATH;
 
-    if (argc > 1)
-    {
-        configPath = argv[1];
-    }
+    bool invalidOption = false;
 
     debugEnabled = false;
     if (std::filesystem::exists(debugEnablePath))
@@ -73,7 +88,36 @@ int main(int argc, char **argv)
         std::cerr << "Single point of failure disabled\n";
     }
 
-    run(configPath);
+    for (int i = 1; i < argc; i++)
+    {
+        if (std::strcmp(argv[i], "--file") == 0 || std::strcmp(argv[i], "-f") == 0)
+        {
+            configPath = argv[i + 1];
+            i++;
+        }
+        else if (std::strcmp(argv[i], "--loose") == 0 || std::strcmp(argv[i], "-l") == 0)
+        {
+            spofEnabled = false;
+        }
+        else if (std::strcmp(argv[i], "--debug") == 0 || std::strcmp(argv[i], "-d") == 0)
+        {
+            debugEnabled = true;
+        }
+        else if (std::strcmp(argv[i], "--ignore") == 0 || std::strcmp(argv[i], "-g") == 0)
+        {
+            ignoreEnable = true;
+        }
+        else
+        {
+            invalidOption = true;
+            printHelp();
+        }
+    }
+
+    if (!invalidOption)
+    {
+        run(configPath);
+    }
 
     return 0;
 }
