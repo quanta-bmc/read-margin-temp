@@ -25,6 +25,8 @@ extern bool ignoreEnable;
 std::map<std::string, struct conf::SensorConfig> sensorConfig = {};
 std::map<int, conf::SkuConfig> skusConfig;
 
+sdbusplus::bus::bus* g_system_bus, *g_default_bus;
+
 void printHelp()
 {
     std::cout << "Option : " << std::endl;
@@ -42,6 +44,12 @@ void printHelp()
 
 void run(const std::string& configPath)
 {
+    // Create DBus connections
+    auto system_bus = sdbusplus::bus::new_system();
+    auto default_bus = sdbusplus::bus::new_default();
+    g_system_bus = &system_bus;
+    g_default_bus = &default_bus;
+
     try
     {
         auto jsonData = parseValidateJson(configPath);

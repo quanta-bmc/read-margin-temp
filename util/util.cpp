@@ -15,6 +15,7 @@
 #include "sensor/sensor.hpp"
 #include "dbus/dbus.hpp"
 
+extern sdbusplus::bus::bus *g_system_bus, *g_default_bus;
 
 // Enables single-point-of-failure behavior
 bool spofEnabled = false;
@@ -61,7 +62,7 @@ double readDoubleOrNan(std::istream& is)
 
 double getSensorDbusTemp(std::string sensorDbusPath, bool unitMilli)
 {
-    auto bus = sdbusplus::bus::new_default();
+    sdbusplus::bus::bus& bus = *g_default_bus;
     std::string service = getService(sensorDbusPath);
 
     double value = std::numeric_limits<double>::quiet_NaN();
@@ -213,7 +214,7 @@ double calOffsetValue(int setPointInt,
 
 std::string getService(const std::string dbusPath)
 {
-    auto bus = sdbusplus::bus::new_system();
+    sdbusplus::bus::bus& bus = *g_system_bus;
     auto mapper =
         bus.new_method_call("xyz.openbmc_project.ObjectMapper",
                             "/xyz/openbmc_project/object_mapper",
@@ -248,8 +249,8 @@ void updateDbusMarginTemp(int zoneNum,
                           double marginTemp,
                           std::string targetPath)
 {
-    auto bus = sdbusplus::bus::new_default();
-    std::string service = getService(targetPath);
+    sdbusplus::bus::bus& bus = *g_default_bus;
+	std::string service = getService(targetPath);
 
     if (service.empty())
     {
