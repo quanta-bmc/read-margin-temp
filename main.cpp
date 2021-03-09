@@ -22,6 +22,8 @@ extern bool spofEnabled;
 
 extern bool ignoreEnable;
 
+extern bool nvmePresentEnable;
+
 std::map<std::string, struct conf::SensorConfig> sensorConfig = {};
 std::map<int, conf::SkuConfig> skusConfig;
 
@@ -30,14 +32,16 @@ sdbusplus::bus::bus* g_system_bus, *g_default_bus;
 void printHelp()
 {
     std::cout << "Option : " << std::endl;
-    std::cout << "    --file, -f [path]: the direct path of config file"
+    std::cout << "    --file, -f [path]: The direct path of config file"
               << std::endl;
     std::cout << "        default : " << MARGINCONFIGPATH << std::endl;
-    std::cout << "    --loose, -l : ignore a sensor lost"
+    std::cout << "    --loose, -l : Ignore a sensor lost"
               << std::endl;
-    std::cout << "    --debug, -d : enable debug mode to print log"
+    std::cout << "    --debug, -d : Enable debug mode to print log"
               << std::endl;
-    std::cout << "    --ignore, -g : enable to ignore if sensor service is empty"
+    std::cout << "    --ignore, -g : Enable to ignore if sensor service is empty"
+              << std::endl;
+    std::cout << "    --present, -p : Disable consider NVMe sensor Present property"
               << std::endl;
     std::cout << "" << std::endl;
 }
@@ -114,6 +118,10 @@ int main(int argc, char **argv)
         else if (std::strcmp(argv[i], "--ignore") == 0 || std::strcmp(argv[i], "-g") == 0)
         {
             ignoreEnable = true;
+        }
+        else if (std::strcmp(argv[i], "--present") == 0 || std::strcmp(argv[i], "-p") == 0)
+        {
+            nvmePresentEnable = false;
         }
         else
         {

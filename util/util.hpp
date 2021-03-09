@@ -52,7 +52,7 @@ double calOffsetValue(int setPointInt,
  * @param[in] dbusPath - sensor dbus path.
  * @return Dbus service name.
  */
-std::string getService(const std::string dbusPath);
+std::string getService(const std::string dbusPath, std::string interfacePath);
 
 /**
  * Update margin temp of zone zoneNum.

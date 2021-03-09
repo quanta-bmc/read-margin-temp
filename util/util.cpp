@@ -26,6 +26,10 @@ bool debugEnabled = false;
 // Enable ignore empty sensor service failure
 bool ignoreEnable = false;
 
+// Enable consider NVMe sensor Present property
+bool nvmePresentEnable = true;
+
+// flag when sensor service is empty
 bool emptyService = false;
 
 int getSkuNum()
@@ -63,9 +67,27 @@ double readDoubleOrNan(std::istream& is)
 double getSensorDbusTemp(std::string sensorDbusPath, bool unitMilli)
 {
     sdbusplus::bus::bus& bus = *g_default_bus;
-    std::string service = getService(sensorDbusPath);
+    std::string service = getService(sensorDbusPath, VALUEINTERFACE);
 
     double value = std::numeric_limits<double>::quiet_NaN();
+
+    // check NVMe sensor Present property
+    if (sensorDbusPath.find("nvme") != std::string::npos && nvmePresentEnable)
+    {
+        std::string nvmeInventoryPath = sensorDbusPath;
+        nvmeInventoryPath.erase(nvmeInventoryPath.begin(),
+            nvmeInventoryPath.begin() + nvmeInventoryPath.find("nvme"));
+        nvmeInventoryPath =
+            "/xyz/openbmc_project/inventory/system/chassis/motherboard/" + nvmeInventoryPath;
+        std::string nvmeService = getService(nvmeInventoryPath, PRESENTINTERFACE);
+
+        if (!dbus::SDBusPlus::checkNvmePresentProperty(bus,
+                                                       nvmeService,
+                                                       nvmeInventoryPath))
+        {
+            return std::numeric_limits<double>::min();
+        }
+    }
 
     if (service.empty())
     {
@@ -212,7 +234,7 @@ double calOffsetValue(int setPointInt,
     return offsetValue;
 }
 
-std::string getService(const std::string dbusPath)
+std::string getService(const std::string dbusPath, std::string interfacePath)
 {
     sdbusplus::bus::bus& bus = *g_system_bus;
     auto mapper =
@@ -221,7 +243,7 @@ std::string getService(const std::string dbusPath)
                             "xyz.openbmc_project.ObjectMapper", "GetObject");
 
     mapper.append(dbusPath);
-    mapper.append(std::vector<std::string>({"xyz.openbmc_project.Sensor.Value"}));
+    mapper.append(std::vector<std::string>({interfacePath}));
 
     std::map<std::string, std::vector<std::string>> response;
 
@@ -250,7 +272,7 @@ void updateDbusMarginTemp(int zoneNum,
                           std::string targetPath)
 {
     sdbusplus::bus::bus& bus = *g_default_bus;
-	std::string service = getService(targetPath);
+	std::string service = getService(targetPath, VALUEINTERFACE);
 
     if (service.empty())
     {

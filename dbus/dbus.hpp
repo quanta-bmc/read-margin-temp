@@ -18,6 +18,7 @@ constexpr auto VALUEINTERFACE = "xyz.openbmc_project.Sensor.Value";
 constexpr auto FUNCTIONALINTERFACE = "xyz.openbmc_project.State.Decorator.OperationalStatus";
 constexpr auto WARNINGINTERFACE = "xyz.openbmc_project.Sensor.Threshold.Warning";
 constexpr auto CRITICALINTERFACE = "xyz.openbmc_project.Sensor.Threshold.Critical";
+constexpr auto PRESENTINTERFACE = "xyz.openbmc_project.Inventory.Item";
 
 namespace dbus
 {
@@ -232,6 +233,36 @@ class SDBusPlus
 
             // std::cerr << "Functional : " << functional << std::endl;
             return functional;
+        }
+        /**
+         * Get nvme sensor Present property.
+         *
+         * @param[in] bus - bus.
+         * @param[in] service - dbus service name.
+         * @param[in] path - dbus path.
+         * @return Present property from dbus
+         */
+        static bool checkNvmePresentProperty(sdbusplus::bus::bus& bus,
+                                             const std::string& service,
+                                             const std::string& path)
+        {
+            PropertyMap propMap;
+            auto pimMsg = bus.new_method_call(service.c_str(), path.c_str(),
+                DBUSPROPERTYINTERFACE, "GetAll");
+            pimMsg.append(PRESENTINTERFACE);
+            bool present = false;
+            try
+            {
+                auto presentResponseMsg = bus.call(pimMsg);
+                presentResponseMsg.read(propMap);
+                present = std::get<bool>(propMap["Present"]);
+            }
+            catch (const std::exception& e)
+            {
+                // std::cerr << "Get Present property failed." << std::endl;
+            }
+            // std::cerr << property << " : " << present << std::endl;
+            return present;
         }
 };
 }
