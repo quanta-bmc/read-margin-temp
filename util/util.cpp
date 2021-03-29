@@ -85,7 +85,12 @@ double getSensorDbusTemp(std::string sensorDbusPath, bool unitMilli)
                                                        nvmeService,
                                                        nvmeInventoryPath))
         {
-            return std::numeric_limits<double>::min();
+            // Treat missing NVMe similarly to other missing services
+            if (ignoreEnable)
+            {
+                emptyService = true;
+            }
+            return value;
         }
     }
 
