@@ -33,8 +33,9 @@ class SDBusPlus
          * @param[in] objPath - object path.
          * @param[in] value - value to be set, in degrees, regardless of unitMilli.
          * @param[in] unitMilli - true to set millidegrees, false to set degrees.
+         * @return True if successful, false if error
          */
-        static void setValueProperty(sdbusplus::bus::bus& bus,
+        static bool setValueProperty(sdbusplus::bus::bus& bus,
                                      const std::string& busName,
                                      const std::string& objPath,
                                      const double& value,
@@ -63,12 +64,15 @@ class SDBusPlus
                     methodCall.append(std::variant<double>(value));
                 }
 
-                auto reply = bus.call(methodCall);
+                bus.call_noreply(methodCall);
             }
             catch (const std::exception& e)
             {
                 std::cerr << "Set dbus properties fail. " << e.what() << std::endl;
+                return false;
             }
+
+            return true;
         }
 
         /**
