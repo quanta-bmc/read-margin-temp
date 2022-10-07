@@ -297,7 +297,7 @@ double getValueCache(const std::string& objectPath, sdbusplus::bus::bus& bus, bo
             }
             return nan;
         }
-        
+
         // If good value already received, no need to fetch manually
         if (std::isfinite(found->second->received))
         {
@@ -328,7 +328,7 @@ double getValueCache(const std::string& objectPath, sdbusplus::bus::bus& bus, bo
         }
         return nan;
     }
-    
+
     if (!(found->second->valid))
     {
         return nan;
@@ -444,13 +444,13 @@ double parseMessage(sdbusplus::message::message& msg, const std::string& source,
         {
             isAlarmInterface = true;
         }
-        
+
         if (!isAlarmInterface)
         {
             std::cerr << "Message received, but unrecognized interface: " << interface << " from " << source << "\n";
             return nan;
         }
-        
+
         // See if a known alarm
         bool badIndication = true;
         auto found = content.find("Functional");
@@ -459,7 +459,7 @@ double parseMessage(sdbusplus::message::message& msg, const std::string& source,
             // Functional is inverted logic, true indicates good condition
             badIndication = false;
         }
-        
+
         // All other alarms are consistent, false indicates good condition
         if (found == content.end())
         {
@@ -482,14 +482,14 @@ double parseMessage(sdbusplus::message::message& msg, const std::string& source,
             std::cerr << "Alarm received, but unrecognized content: " << interface << " from " << source << "\n";
             return nan;
         }
-        
+
         const bool* bptr = std::get_if<bool>(&(found->second));
         if (!bptr)
         {
             std::cerr << "Alarm received, but unparseable content: " << source << "\n";
             return nan;
         }
-        
+
         bool alarmIndication = *bptr;
         if (alarmIndication == badIndication)
         {
@@ -501,7 +501,7 @@ double parseMessage(sdbusplus::message::message& msg, const std::string& source,
             }
             return nan;
         }
-        
+
         // Good reception of alarm signal, indication is of good condition
         if (debugCache)
         {
@@ -643,7 +643,7 @@ double getSensorDbusTemp(std::string sensorDbusPath, bool unitMilli)
         }
         setValueCacheAlarm(sensorDbusPath, false);
     }
-    
+
     value = dbus::SDBusPlus::getValueProperty(bus,
                                               service,
                                               sensorDbusPath,
